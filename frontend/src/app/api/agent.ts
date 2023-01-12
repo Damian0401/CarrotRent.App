@@ -1,9 +1,10 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { toast } from "react-toastify";
 import { BASE_API_URL } from "../common/utils/constants";
 import { Department as DepartmentDto, DepartmentDetails, DepartmentMarker } from "../models/Department";
 import { User, UserLoginValues, UserRegisterValues } from "../models/User";
 import { Vehicle as VehicleDto, VehicleCreateValues, VehicleDetails, VehicleEditValues, VehicleFilters } from "../models/Vehicle";
-
+import { history } from "../..";
 
 axios.defaults.baseURL = BASE_API_URL;
 
@@ -14,6 +15,25 @@ axios.interceptors.request.use(request => {
     return request;
 });
 
+axios.interceptors.response.use(response => response, (error: AxiosError) => {
+    if (!error.response)
+    {
+        toast.error('Network error');
+        return Promise.reject(error);
+    }
+
+    const { status } = error.response;
+    switch (status) {
+        case 403:
+            history.push('/access-denied');
+            break;
+        case 404:
+            history.push('/not-found');
+            break;
+    }
+
+    return Promise.reject(error);
+})
 
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 

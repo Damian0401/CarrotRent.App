@@ -17,10 +17,13 @@ import AnonymousRoute from "../common/shared/AnonymousRoute";
 import VehicleEdit from "../../features/vehicle/edit/VehicleEdit";
 import { EMPLOYEE, MANAGER } from "../common/utils/constants";
 import VehicleCreate from "../../features/vehicle/create/VehicleCreate";
+import { ToastContainer } from "react-toastify";
+import AccessDenied from "../../features/error/AccessDenied";
 
 function App() {
   return (
     <div style={{ height: '93vh', width: '100vw' }}>
+      <ToastContainer position='bottom-right' hideProgressBar />
       <ToggleThemeButton />
       <Routes>
         <Route element={<Navbar />}>
@@ -54,6 +57,7 @@ function App() {
             <Route index element={<RentDashboard />} />
             <Route path=':id' element={<RentDetails />} />
           </Route>
+          <Route path='access-denied' element={<AccessDenied />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

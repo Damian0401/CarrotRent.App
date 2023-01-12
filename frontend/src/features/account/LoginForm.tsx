@@ -10,6 +10,7 @@ import { useContext } from "react";
 import { UserContext } from "../../app/common/providers/UserProvider";
 import { UserAction, UserActionType } from "../../app/common/reducers/UserReducer";
 import agent from "../../app/api/agent";
+import { toast } from "react-toastify";
 
 
 export default function LoginForm() {
@@ -25,13 +26,14 @@ export default function LoginForm() {
 
     const handleLogin = (loginValues: UserLoginValues) => {
         agent.Account.login(loginValues).then(user => {
+            if (!user) return;
             const action: UserAction = {
                 type: UserActionType.SET_USER,
                 payload: user
             };
             dispatch(action);
             navigate('/');
-        }).catch(e => console.log(e));
+        }).catch(() => toast.error('Invalid login or password'));
     }
 
     return (

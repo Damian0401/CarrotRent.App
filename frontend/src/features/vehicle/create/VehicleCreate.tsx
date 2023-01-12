@@ -1,5 +1,5 @@
 import { CardBody, CardHeader } from "@chakra-ui/card";
-import { Button, ButtonGroup, Flex, FormControl, FormErrorMessage, FormLabel, Heading, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Select, Text } from "@chakra-ui/react";
+import { Button, ButtonGroup, Flex, FormControl, FormErrorMessage, Heading, Select } from "@chakra-ui/react";
 import { FieldProps, Formik, Field } from "formik";
 import { useContext, useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
@@ -12,6 +12,7 @@ import { VehicleCreateValues, VehicleFilters } from "../../../app/models/Vehicle
 import * as Yup from 'yup';
 import MyInput from "../../../app/common/form/MyInput";
 import MyNumberInput from "../../../app/common/form/MyNumberInput";
+import { toast } from "react-toastify";
 
 
 export default function VehicleCreate() {
@@ -37,9 +38,9 @@ export default function VehicleCreate() {
     }, []);
 
     const handleSubmit = (values: VehicleCreateValues) => {
-        console.table(values);
-        console.table(filters?.brands.map(x => x.models).flat())
-        agent.Vehicle.create(values).then(() => navigate(-1))
+        agent.Vehicle.create(values)
+            .then(() => navigate(-1))
+            .catch(() => toast.error('Invalid vehicle data'));
     }
 
     if (!userCanCreateVehicle(user, departmentId)) return <Navigate to='/' />
