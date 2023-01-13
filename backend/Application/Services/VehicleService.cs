@@ -59,7 +59,9 @@ public class VehicleService : IVehicleService
         if (!user.Id.Equals(department.ManagerId) && !department.Employees.Any(x => x.Id.Equals(user.Id)))
             return false;
 
-        var isUpdated = _vehicleRepository.UpdateVehicle(id, dto);
+        var mappedVehicle = _mapper.Map<Vehicle>(dto);
+
+        var isUpdated = _vehicleRepository.UpdateVehicle(id, mappedVehicle);
 
         return isUpdated;
     }

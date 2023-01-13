@@ -194,14 +194,14 @@ public class VehicleRepository : IVehicleRepository
             .Any(x => x.Vin.Equals(vin));
     }
 
-    public bool UpdateVehicle(Guid id, UpdateVehicleDtoRequest dto)
+    public bool UpdateVehicle(Guid id, Vehicle dto)
     {
         var vehicle = _context.Vehicles.Find(id);
 
         if (vehicle is null)
             return false;
 
-        vehicle.PriceId = GetPriceId(dto.Price);
+        vehicle.PriceId = GetPriceId(dto.Price.PricePerDay);
         vehicle.Description = dto.Description;
         vehicle.Seats = dto.Seats;
         vehicle.YearOfProduction = dto.YearOfProduction;

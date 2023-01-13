@@ -42,6 +42,9 @@ public class AutoMapperProfile : Profile
                 s.MapFrom(m => m.Model.Name));
         CreateMap<CreateVehicleDtoRequest, Vehicle>()
             .ForMember(x => x.Price, s => s.Ignore());
+        CreateMap<UpdateVehicleDtoRequest, Vehicle>()
+            .ForMember(x => x.Price, s => s.MapFrom(v => 
+                new Price{PricePerDay = v.Price}));
         CreateMap<Vehicle, VehicleForGetDepartmentByIdDtoResponse>()
             .ForMember(x => x.Model, s =>
                 s.MapFrom(v => v.Model.Name))

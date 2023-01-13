@@ -15,7 +15,7 @@ namespace Application.Interfaces
         bool IsRegistrationAvailable(string registration);
         Vehicle? GetVehicleById(Guid id);
         List<Vehicle> GetFilteredVehicles(GetFilteredVehiclesDtoRequest dto);
-        bool UpdateVehicle(Guid id, UpdateVehicleDtoRequest dto);
+        bool UpdateVehicle(Guid id, Vehicle dto);
         bool CreateVehicle(Vehicle dto);
         Guid GetPriceId(double pricePerDay);
         bool DeleteVehicle(Guid id);

@@ -60,7 +60,7 @@ public class AccountRepository : IAccountRepository
             .Any(x => x.Email.Equals(email));
     }
 
-    public bool IsLoginsAvailable(string login)
+    public bool IsLoginAvailable(string login)
     {
         return !_context
             .Users

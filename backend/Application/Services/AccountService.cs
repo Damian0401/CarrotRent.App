@@ -88,7 +88,7 @@ public class AccountService : IAccountService
         if (!_accountRepository.IsEmailAvailable(dto.Email))
             return false;
 
-        if (!_accountRepository.IsLoginsAvailable(dto.Login))
+        if (!_accountRepository.IsLoginAvailable(dto.Login))
             return false;
 
         if (!_accountRepository.IsPeselAvailable(dto.Pesel))
