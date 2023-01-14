@@ -53,6 +53,11 @@ public class AccountRepository : IAccountRepository
             .FirstOrDefault(x => x.Login.Equals(login));
     }
 
+    public string? GetUserRoleName(Guid userId)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool IsEmailAvailable(string email)
     {
         return !_context
@@ -79,5 +84,10 @@ public class AccountRepository : IAccountRepository
         return !_context
             .UserData
             .Any(x => x.PhoneNumber.Equals(phoneNumber));
+    }
+
+    public bool VerifyUser(Guid userId)
+    {
+        throw new NotImplementedException();
     }
 }

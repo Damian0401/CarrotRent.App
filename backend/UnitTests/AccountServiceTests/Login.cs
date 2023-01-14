@@ -37,11 +37,13 @@ public class Login
         var user = new User();
         var hasher = new PasswordHasher<User>();
         user.PasswordHash = hasher.HashPassword(user, userPassword);
+        var userAccessorMock = new Mock<IUserAccessor>();
 
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.GetUserByLogin(It.IsAny<string>())).Returns(user);
 
-        var accountService = new AccountService(accountRepositoryMock.Object, _mapper, _jwtGenerator);
+        var accountService = new AccountService(accountRepositoryMock.Object, 
+            _mapper, _jwtGenerator, userAccessorMock.Object);
 
         var request = new LoginDtoRequest
         {
@@ -68,11 +70,13 @@ public class Login
         };
         var hasher = new PasswordHasher<User>();
         user.PasswordHash = hasher.HashPassword(user, password);
+        var userAccessorMock = new Mock<IUserAccessor>();
 
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.GetUserByLogin(userLogin)).Returns(user);
 
-        var accountService = new AccountService(accountRepositoryMock.Object, _mapper, _jwtGenerator);
+        var accountService = new AccountService(accountRepositoryMock.Object, 
+            _mapper, _jwtGenerator, userAccessorMock.Object);
 
         var request = new LoginDtoRequest
         {
@@ -91,10 +95,12 @@ public class Login
     public void Login_UserNotFound_ReturnsNull()
     {
         // Arrange
+        var userAccessorMock = new Mock<IUserAccessor>();
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.GetUserByLogin(It.IsAny<string>())).Returns<LoginDtoRequest?>(null);
 
-        var accountService = new AccountService(accountRepositoryMock.Object, _mapper, _jwtGenerator);
+        var accountService = new AccountService(accountRepositoryMock.Object, 
+            _mapper, _jwtGenerator, userAccessorMock.Object);
 
         var request = new LoginDtoRequest
         {

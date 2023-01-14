@@ -12,9 +12,12 @@ public class AccountService : IAccountService
     private readonly IAccountRepository _accountRepository;
     private readonly IMapper _mapper;
     private readonly IJwtGenerator _jwtGenerator;
+    private readonly IUserAccessor _userAccessor;
 
-    public AccountService(IAccountRepository accountRepository, IMapper mapper, IJwtGenerator jwtGenerator)
+    public AccountService(IAccountRepository accountRepository, IMapper mapper,
+        IJwtGenerator jwtGenerator, IUserAccessor userAccessor)
     {
+        _userAccessor = userAccessor;
         _jwtGenerator = jwtGenerator;
         _mapper = mapper;
         _accountRepository = accountRepository;
@@ -45,7 +48,7 @@ public class AccountService : IAccountService
             return null;
 
         var address = _mapper.Map<Address>(dto);
-        
+
         var userData = _mapper.Map<UserData>(dto);
         userData.Address = address;
 
@@ -61,8 +64,28 @@ public class AccountService : IAccountService
 
         var response = _mapper.Map<RegisterDtoResponse>(user);
         response.Token = _jwtGenerator.CreateToken(user, DateTime.Now.AddDays(3));
-        
+
         return response;
+    }
+
+    public bool Verify(Guid userId)
+    {
+        var user = _userAccessor.GetCurrentlyLoggedUser();
+
+        if (user is null)
+            return false;
+
+        if (!user.Role.Name.Equals(Roles.Employee) && !user.Role.Name.Equals(Roles.Manager))
+            return false;
+
+        var userToVerifyRole = _accountRepository.GetUserRoleName(userId);
+
+        if (userToVerifyRole is null || !userToVerifyRole.Equals(Roles.Unverified))
+            return false;
+
+        var isVerified = _accountRepository.VerifyUser(userId);
+
+        return isVerified;
     }
 
     private string GeneratePasswordHash(User user, string password)

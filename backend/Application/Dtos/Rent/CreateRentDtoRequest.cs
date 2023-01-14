@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+namespace Application.Dtos.Rent;
 
-namespace Application.Dtos.Rent
+public class CreateRentDtoRequest
 {
-    public class CreateRentDtoRequest
-    {
-        
-    }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+    public Guid VehicleId { get; set; }
 }

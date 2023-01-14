@@ -51,12 +51,14 @@ public class VehicleService : IVehicleService
         if (user is null)
             return false;
 
-        var department = _vehicleRepository.GetVehicleDepartment(id);
+        var department = _vehicleRepository
+            .GetVehicleDepartment(id);
 
         if (department is null)
             return false;
 
-        if (!user.Id.Equals(department.ManagerId) && !department.Employees.Any(x => x.Id.Equals(user.Id)))
+        if (!user.Id.Equals(department.ManagerId) && 
+            !department.Employees.Any(x => x.Id.Equals(user.Id)))
             return false;
 
         var mappedVehicle = _mapper.Map<Vehicle>(dto);

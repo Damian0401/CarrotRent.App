@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence;
 
@@ -11,9 +12,10 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230114145842_Corrected_Typo_In_Rent_Model")]
+    partial class Corrected_Typo_In_Rent_Model
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,7 +186,7 @@ namespace Persistence.Migrations
                     b.Property<Guid>("ClientId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("ReceiverId")
@@ -196,7 +198,7 @@ namespace Persistence.Migrations
                     b.Property<Guid?>("RenterId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("VehicleId")

@@ -33,10 +33,12 @@ public class Register
         var email = "RequestEmail";
         var request = new RegisterDtoRequest { Email = email };
 
+        var userAccessorMock = new Mock<IUserAccessor>();
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.IsEmailAvailable(email)).Returns(false);
 
-        var accountService = new AccountService(accountRepositoryMock.Object, _mapper, _jwtGenerator);
+        var accountService = new AccountService(accountRepositoryMock.Object, 
+            _mapper, _jwtGenerator, userAccessorMock.Object);
 
         // Act
         var result = accountService.Register(request);
@@ -57,11 +59,13 @@ public class Register
             Login = login
         };
 
+        var userAccessorMock = new Mock<IUserAccessor>();
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.IsEmailAvailable(email)).Returns(true);
         accountRepositoryMock.Setup(x => x.IsLoginAvailable(login)).Returns(false);
 
-        var accountService = new AccountService(accountRepositoryMock.Object, _mapper, _jwtGenerator);
+        var accountService = new AccountService(accountRepositoryMock.Object, 
+            _mapper, _jwtGenerator, userAccessorMock.Object);
 
 
         // Act
@@ -85,12 +89,14 @@ public class Register
             Pesel = pesel
         };
 
+        var userAccessorMock = new Mock<IUserAccessor>();
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.IsEmailAvailable(email)).Returns(true);
         accountRepositoryMock.Setup(x => x.IsLoginAvailable(login)).Returns(true);
         accountRepositoryMock.Setup(x => x.IsPeselAvailable(pesel)).Returns(false);
 
-        var accountService = new AccountService(accountRepositoryMock.Object, _mapper, _jwtGenerator);
+        var accountService = new AccountService(accountRepositoryMock.Object, 
+            _mapper, _jwtGenerator, userAccessorMock.Object);
 
         // Act
         var result = accountService.Register(request);
@@ -115,13 +121,15 @@ public class Register
             PhoneNumber = phoneNumber
         };
 
+        var userAccessorMock = new Mock<IUserAccessor>();
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.IsEmailAvailable(email)).Returns(true);
         accountRepositoryMock.Setup(x => x.IsLoginAvailable(login)).Returns(true);
         accountRepositoryMock.Setup(x => x.IsPeselAvailable(pesel)).Returns(true);
         accountRepositoryMock.Setup(x => x.IsPhoneNumberAvailable(phoneNumber)).Returns(false);
 
-        var accountService = new AccountService(accountRepositoryMock.Object, _mapper, _jwtGenerator);
+        var accountService = new AccountService(accountRepositoryMock.Object, 
+            _mapper, _jwtGenerator, userAccessorMock.Object);
 
         // Act
         var result = accountService.Register(request);
@@ -147,13 +155,15 @@ public class Register
             Password = "UserPassword"
         };
 
+        var userAccessorMock = new Mock<IUserAccessor>();
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.IsEmailAvailable(email)).Returns(true);
         accountRepositoryMock.Setup(x => x.IsLoginAvailable(login)).Returns(true);
         accountRepositoryMock.Setup(x => x.IsPeselAvailable(pesel)).Returns(true);
         accountRepositoryMock.Setup(x => x.IsPhoneNumberAvailable(phoneNumber)).Returns(false);
 
-        var accountService = new AccountService(accountRepositoryMock.Object, _mapper, _jwtGenerator);
+        var accountService = new AccountService(accountRepositoryMock.Object, 
+            _mapper, _jwtGenerator, userAccessorMock.Object);
 
         // Act
         var result = accountService.Register(request);

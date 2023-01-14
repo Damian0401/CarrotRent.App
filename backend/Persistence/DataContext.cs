@@ -74,9 +74,9 @@ public class DataContext : DbContext
             .HasForeignKey(x => x.RenterId)
             .IsRequired(false);
         builder.Entity<Rent>()
-            .HasOne(x => x.Reciever)
+            .HasOne(x => x.Receiver)
             .WithMany(x => x.RecievedRentings)
-            .HasForeignKey(x => x.RecieverId)
+            .HasForeignKey(x => x.ReceiverId)
             .IsRequired(false);
         builder.Entity<Rent>()
             .HasOne(x => x.RentStatus)

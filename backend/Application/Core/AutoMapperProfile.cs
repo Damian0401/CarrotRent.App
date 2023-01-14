@@ -1,5 +1,6 @@
 using Application.Dtos.Account;
 using Application.Dtos.Department;
+using Application.Dtos.Rent;
 using Application.Dtos.Vehicle;
 using AutoMapper;
 using Domain.Models;
@@ -92,7 +93,12 @@ public class AutoMapperProfile : Profile
 
     private void MapsForRent()
     {
-
+        CreateMap<CreateRentDtoRequest, Rent>();
+        CreateMap<Rent, RentForGetDepartmentArchivedRentsDtoResponse>();
+        CreateMap<Rent, RentForGetDepartmentRentsDtoResponse>();
+        CreateMap<Rent, RentForGetMyArchivedRentsDtoResponse>();
+        CreateMap<Rent, RentForGetMyRentsDtoResponse>();
+        CreateMap<Rent, GetRentByIdDtoResponse>();
     }
 
     private void MapsForAddress()
