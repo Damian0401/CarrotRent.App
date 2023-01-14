@@ -9,7 +9,7 @@ namespace Application.Interfaces
         bool IsPhoneNumberAvailable(string phoneNumber);
         bool IsLoginAvailable(string login);
         bool CreateUser(User user);
-        bool VerifyUser(Guid userId);
+        bool UpdateUserRoleId(Guid userId, Guid roleId);
         string? GetUserRoleName(Guid userId);
         User? GetUserByLogin(string login);
         Role GetRoleByName(string roleName);

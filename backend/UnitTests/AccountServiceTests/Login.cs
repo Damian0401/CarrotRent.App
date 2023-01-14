@@ -15,6 +15,7 @@ public class Login
 {
     private readonly IMapper _mapper;
     private readonly IJwtGenerator _jwtGenerator;
+    private readonly IUserAccessor _userAccessor;
 
     public Login()
     {
@@ -22,6 +23,9 @@ public class Login
         jwtGeneratorMock.Setup(x => x.CreateToken(It.IsAny<User>(), It.IsAny<DateTime>()))
             .Returns("token");
         _jwtGenerator = jwtGeneratorMock.Object;
+
+        var userAccessorMock = new Mock<IUserAccessor>();
+        _userAccessor = userAccessorMock.Object;
 
         _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
@@ -37,13 +41,12 @@ public class Login
         var user = new User();
         var hasher = new PasswordHasher<User>();
         user.PasswordHash = hasher.HashPassword(user, userPassword);
-        var userAccessorMock = new Mock<IUserAccessor>();
 
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.GetUserByLogin(It.IsAny<string>())).Returns(user);
 
         var accountService = new AccountService(accountRepositoryMock.Object, 
-            _mapper, _jwtGenerator, userAccessorMock.Object);
+            _mapper, _jwtGenerator, _userAccessor);
 
         var request = new LoginDtoRequest
         {
@@ -62,6 +65,30 @@ public class Login
     public void Login_SamePassword_ReturnsResponse()
     {
         // Arrange
+        var password = "UserPassword";
+        var user = new User();
+        var hasher = new PasswordHasher<User>();
+        user.PasswordHash = hasher.HashPassword(user, password);
+
+        var accountRepositoryMock = new Mock<IAccountRepository>();
+        accountRepositoryMock.Setup(x => x.GetUserByLogin(It.IsAny<string>())).Returns(user);
+
+        var accountService = new AccountService(accountRepositoryMock.Object, 
+            _mapper, _jwtGenerator, _userAccessor);
+
+        var request = new LoginDtoRequest { Password = password };
+
+        // Act
+        var result = accountService.Login(request);
+
+        // Assert
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void Login_SamePassword_ReturnsCorrectLogin()
+    {
+        // Arrange
         var userLogin = "UserLogin";
         var password = "UserPassword";
         var user = new User()
@@ -70,13 +97,12 @@ public class Login
         };
         var hasher = new PasswordHasher<User>();
         user.PasswordHash = hasher.HashPassword(user, password);
-        var userAccessorMock = new Mock<IUserAccessor>();
 
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.GetUserByLogin(userLogin)).Returns(user);
 
         var accountService = new AccountService(accountRepositoryMock.Object, 
-            _mapper, _jwtGenerator, userAccessorMock.Object);
+            _mapper, _jwtGenerator, _userAccessor);
 
         var request = new LoginDtoRequest
         {
@@ -88,19 +114,18 @@ public class Login
         var result = accountService.Login(request);
 
         // Assert
-        Assert.NotNull(result);
+        Assert.Equal(userLogin, result!.Login);
     }
 
     [Fact]
     public void Login_UserNotFound_ReturnsNull()
     {
         // Arrange
-        var userAccessorMock = new Mock<IUserAccessor>();
         var accountRepositoryMock = new Mock<IAccountRepository>();
         accountRepositoryMock.Setup(x => x.GetUserByLogin(It.IsAny<string>())).Returns<LoginDtoRequest?>(null);
 
         var accountService = new AccountService(accountRepositoryMock.Object, 
-            _mapper, _jwtGenerator, userAccessorMock.Object);
+            _mapper, _jwtGenerator, _userAccessor);
 
         var request = new LoginDtoRequest
         {

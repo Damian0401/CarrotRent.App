@@ -86,8 +86,17 @@ public class AccountRepository : IAccountRepository
             .Any(x => x.PhoneNumber.Equals(phoneNumber));
     }
 
-    public bool VerifyUser(Guid userId)
+    public bool UpdateUserRoleId(Guid userId, Guid roleId)
     {
-        throw new NotImplementedException();
+        var user = _context.Users.Find(userId);
+
+        if (user is null) 
+            return false;
+
+        user.RoleId = roleId;
+
+        var isUpdated = _context.SaveChanges() > 0;
+
+        return isUpdated;
     }
 }

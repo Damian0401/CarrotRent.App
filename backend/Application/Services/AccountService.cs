@@ -83,9 +83,14 @@ public class AccountService : IAccountService
         if (userToVerifyRole is null || !userToVerifyRole.Equals(Roles.Unverified))
             return false;
 
-        var isVerified = _accountRepository.VerifyUser(userId);
+        var clientRole = _accountRepository.GetRoleByName(Roles.Client);
 
-        return isVerified;
+        if (clientRole is null)
+            return false;
+
+        var isUpdated = _accountRepository.UpdateUserRoleId(userId, clientRole.Id);
+
+        return isUpdated;
     }
 
     private string GeneratePasswordHash(User user, string password)

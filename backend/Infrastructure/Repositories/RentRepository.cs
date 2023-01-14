@@ -34,7 +34,9 @@ public class RentRepository : IRentRepository
 
     public Department? GetDepartmentById(Guid id)
     {
-        var department = _context.Departments.Find(id);
+        var department = _context.Departments
+            .Include(x => x.Employees)
+            .FirstOrDefault(x => x.Id.Equals(id));
 
         return department;
     }
