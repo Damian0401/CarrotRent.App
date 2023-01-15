@@ -17,29 +17,24 @@ public class RentService : IRentService
         _userAccessor = userAccessor;
         _mapper = mapper;
     }
-    public bool CancelRent(Guid id)
+    public bool CancelRent(Guid rentId)
     {
-        var user = _userAccessor.GetCurrentlyLoggedUser();
-
-        if (user is null)
-            return false;
-
-        var rent = _rentRepository.GetRentById(id);
+        var rent = _rentRepository.GetRentById(rentId);
 
         if (rent is null)
             return false;
 
-        if (user.Role.Name.Equals(Roles.Client) && !rent.ClientId.Equals(user.Id))
+        var rentDepartmentId = _rentRepository.GetRentDepartmentId(rent.Id);
+
+        if (rentDepartmentId is null)
             return false;
 
-        var rentDepartmrntId = _rentRepository.GetRentDepartmentId(rent.Id);
+        var user = _userAccessor.GetCurrentlyLoggedUser();
 
-        if (rentDepartmrntId is null)
-            return false;
+        var isUserRentOwner = IsUserRentOwner(rent, user);
+        var isUserManagerOrEmployee = IsUserManagerOrEmployee(rentDepartmentId.Value, user);
 
-        var isUserManagerOrEmployee = IsUserManagerOrEmployee(rentDepartmrntId.Value, user);
-
-        if (!isUserManagerOrEmployee)
+        if (!isUserRentOwner && !isUserManagerOrEmployee)
             return false;
 
         var reservedStatusId = _rentRepository
@@ -128,7 +123,7 @@ public class RentService : IRentService
     {
         var user = _userAccessor.GetCurrentlyLoggedUser();
 
-        if (user is null || !user.Role.Equals(Roles.Client))
+        if (user is null || !user.Role.Name.Equals(Roles.Client))
             return null;
 
         var archivedRents = _rentRepository.GetUserArchivedRents(user.Id);
@@ -148,7 +143,7 @@ public class RentService : IRentService
     {
         var user = _userAccessor.GetCurrentlyLoggedUser();
 
-        if (user is null || !user.Role.Equals(Roles.Client))
+        if (user is null || !user.Role.Name.Equals(Roles.Client))
             return null;
 
         var archivedRents = _rentRepository.GetUserRents(user.Id);
@@ -164,14 +159,14 @@ public class RentService : IRentService
         return response;
     }
 
-    public GetRentByIdDtoResponse? GetRentById(Guid id)
+    public GetRentByIdDtoResponse? GetRentById(Guid rentId)
     {
         var user = _userAccessor.GetCurrentlyLoggedUser();
 
         if (user is null)
             return null;
 
-        var rent = _rentRepository.GetRentById(id);
+        var rent = _rentRepository.GetRentById(rentId);
 
         if (rent is null)
             return null;
@@ -186,10 +181,10 @@ public class RentService : IRentService
         return response;
     }
 
-    public bool IssueRent(Guid id)
+    public bool IssueRent(Guid rentId)
     {
         var user = _userAccessor.GetCurrentlyLoggedUser();
-        var rent = _rentRepository.GetRentById(id);
+        var rent = _rentRepository.GetRentById(rentId);
 
         var userCanManageRent = UserCanManageRent(user, rent);
 
@@ -209,10 +204,10 @@ public class RentService : IRentService
         return isUpdated;
     }
 
-    public ReceiveRentDtoResponse? ReceiveRent(Guid id)
+    public ReceiveRentDtoResponse? ReceiveRent(Guid rentId)
     {
         var user = _userAccessor.GetCurrentlyLoggedUser();
-        var rent = _rentRepository.GetRentById(id);
+        var rent = _rentRepository.GetRentById(rentId);
 
         var userCanManageRent = UserCanManageRent(user, rent);
 
@@ -314,6 +309,17 @@ public class RentService : IRentService
         var isUserManagerOrEmployee = IsUserManagerOrEmployee(departmentId.Value, user);
 
         if (!isUserManagerOrEmployee)
+            return false;
+
+        return true;
+    }
+
+    private bool IsUserRentOwner(Rent rent, User? user)
+    {
+        if (user is null)
+            return false;
+
+        if (user.Role.Name.Equals(Roles.Client) && !rent.ClientId.Equals(user.Id))
             return false;
 
         return true;
