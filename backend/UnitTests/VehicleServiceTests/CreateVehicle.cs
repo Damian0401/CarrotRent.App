@@ -12,28 +12,31 @@ namespace UnitTests.VehicleServiceTests;
 
 public class CreateVehicle
 {
-    private readonly IMapper _mapper;
+    private readonly Mock<IVehicleRepository> _vehicleRepositoryMock;
+    private readonly Mock<IUserAccessor> _userAccessorMock;
+    private readonly VehicleService _vehicleService;
 
     public CreateVehicle()
     {
-        _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
+
+        _vehicleRepositoryMock = new();
+        _userAccessorMock = new();
+
+        _vehicleService = new(_vehicleRepositoryMock.Object, mapper, _userAccessorMock.Object);
     }
 
     [Fact]
     public void CreateVehicle_UserNotLogged_ReturnsFalse()
     {
         // Arrange
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
         var dto = new CreateVehicleDtoRequest();
 
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
 
         // Act
-        var result = vehicleService.CreateVehicle(dto);
+        var result = _vehicleService.CreateVehicle(dto);
 
         // Assert
         Assert.False(result);
@@ -44,19 +47,15 @@ public class CreateVehicle
     {
         // Arrange
         var user = new User();
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var departmentId = Guid.NewGuid();
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns<Department?>(null);
+        _vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns<Department?>(null);
 
         var dto = new CreateVehicleDtoRequest { DepartmentId = departmentId };
 
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
-
         // Act
-        var result = vehicleService.CreateVehicle(dto);
+        var result = _vehicleService.CreateVehicle(dto);
 
         // Assert
         Assert.False(result);
@@ -68,21 +67,17 @@ public class CreateVehicle
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var managerId = Guid.NewGuid();
         var departmentId = Guid.NewGuid();
         var department = new Department { ManagerId = managerId };
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
 
         var dto = new CreateVehicleDtoRequest { DepartmentId = departmentId };
 
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
-
         // Act
-        var result = vehicleService.CreateVehicle(dto);
+        var result = _vehicleService.CreateVehicle(dto);
 
         // Assert
         Assert.False(result);
@@ -94,8 +89,7 @@ public class CreateVehicle
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var departmentId = Guid.NewGuid();
         var department = new Department { ManagerId = userId };
@@ -107,14 +101,11 @@ public class CreateVehicle
             Vin = vin
         };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(false);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(false);
 
         // Act
-        var result = vehicleService.CreateVehicle(dto);
+        var result = _vehicleService.CreateVehicle(dto);
 
         // Assert
         Assert.False(result);
@@ -126,8 +117,7 @@ public class CreateVehicle
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var departmentId = Guid.NewGuid();
         var department = new Department { ManagerId = userId };
@@ -141,15 +131,12 @@ public class CreateVehicle
             Registration = registration
         };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(true);
-        vehicleRepositoryMock.Setup(x => x.IsRegistrationAvailable(registration)).Returns(false);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(true);
+        _vehicleRepositoryMock.Setup(x => x.IsRegistrationAvailable(registration)).Returns(false);
 
         // Act
-        var result = vehicleService.CreateVehicle(dto);
+        var result = _vehicleService.CreateVehicle(dto);
 
         // Assert
         Assert.False(result);
@@ -161,8 +148,7 @@ public class CreateVehicle
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var departmentId = Guid.NewGuid();
         var department = new Department { ManagerId = userId };
@@ -178,16 +164,13 @@ public class CreateVehicle
             FuelId = fuelId
         };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(true);
-        vehicleRepositoryMock.Setup(x => x.IsRegistrationAvailable(registration)).Returns(true);
-        vehicleRepositoryMock.Setup(x => x.GetFuelById(fuelId)).Returns<Fuel?>(null);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(true);
+        _vehicleRepositoryMock.Setup(x => x.IsRegistrationAvailable(registration)).Returns(true);
+        _vehicleRepositoryMock.Setup(x => x.GetFuelById(fuelId)).Returns<Fuel?>(null);
 
         // Act
-        var result = vehicleService.CreateVehicle(dto);
+        var result = _vehicleService.CreateVehicle(dto);
 
         // Assert
         Assert.False(result);
@@ -199,8 +182,7 @@ public class CreateVehicle
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var departmentId = Guid.NewGuid();
         var department = new Department { ManagerId = userId };
@@ -219,17 +201,14 @@ public class CreateVehicle
             ModelId = modelId
         };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(true);
-        vehicleRepositoryMock.Setup(x => x.IsRegistrationAvailable(registration)).Returns(true);
-        vehicleRepositoryMock.Setup(x => x.GetFuelById(fuelId)).Returns(fuel);
-        vehicleRepositoryMock.Setup(x => x.GetModelById(modelId)).Returns<Model?>(null);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(true);
+        _vehicleRepositoryMock.Setup(x => x.IsRegistrationAvailable(registration)).Returns(true);
+        _vehicleRepositoryMock.Setup(x => x.GetFuelById(fuelId)).Returns(fuel);
+        _vehicleRepositoryMock.Setup(x => x.GetModelById(modelId)).Returns<Model?>(null);
 
         // Act
-        var result = vehicleService.CreateVehicle(dto);
+        var result = _vehicleService.CreateVehicle(dto);
 
         // Assert
         Assert.False(result);
@@ -241,8 +220,7 @@ public class CreateVehicle
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var departmentId = Guid.NewGuid();
         var department = new Department { ManagerId = userId };
@@ -262,18 +240,15 @@ public class CreateVehicle
             ModelId = modelId
         };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(true);
-        vehicleRepositoryMock.Setup(x => x.IsRegistrationAvailable(registration)).Returns(true);
-        vehicleRepositoryMock.Setup(x => x.GetFuelById(fuelId)).Returns(fuel);
-        vehicleRepositoryMock.Setup(x => x.GetModelById(modelId)).Returns(model);
-        vehicleRepositoryMock.Setup(x => x.CreateVehicle(It.IsAny<Vehicle>())).Returns(false);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(true);
+        _vehicleRepositoryMock.Setup(x => x.IsRegistrationAvailable(registration)).Returns(true);
+        _vehicleRepositoryMock.Setup(x => x.GetFuelById(fuelId)).Returns(fuel);
+        _vehicleRepositoryMock.Setup(x => x.GetModelById(modelId)).Returns(model);
+        _vehicleRepositoryMock.Setup(x => x.CreateVehicle(It.IsAny<Vehicle>())).Returns(false);
 
         // Act
-        var result = vehicleService.CreateVehicle(dto);
+        var result = _vehicleService.CreateVehicle(dto);
 
         // Assert
         Assert.False(result);
@@ -285,8 +260,7 @@ public class CreateVehicle
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var departmentId = Guid.NewGuid();
         var department = new Department { ManagerId = userId };
@@ -306,18 +280,15 @@ public class CreateVehicle
             ModelId = modelId
         };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(true);
-        vehicleRepositoryMock.Setup(x => x.IsRegistrationAvailable(registration)).Returns(true);
-        vehicleRepositoryMock.Setup(x => x.GetFuelById(fuelId)).Returns(fuel);
-        vehicleRepositoryMock.Setup(x => x.GetModelById(modelId)).Returns(model);
-        vehicleRepositoryMock.Setup(x => x.CreateVehicle(It.IsAny<Vehicle>())).Returns(true);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.IsVinAvailable(vin)).Returns(true);
+        _vehicleRepositoryMock.Setup(x => x.IsRegistrationAvailable(registration)).Returns(true);
+        _vehicleRepositoryMock.Setup(x => x.GetFuelById(fuelId)).Returns(fuel);
+        _vehicleRepositoryMock.Setup(x => x.GetModelById(modelId)).Returns(model);
+        _vehicleRepositoryMock.Setup(x => x.CreateVehicle(It.IsAny<Vehicle>())).Returns(true);
 
         // Act
-        var result = vehicleService.CreateVehicle(dto);
+        var result = _vehicleService.CreateVehicle(dto);
 
         // Assert
         Assert.True(result);

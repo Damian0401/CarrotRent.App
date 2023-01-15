@@ -13,12 +13,19 @@ namespace UnitTests.VehicleServiceTests;
 
 public class DeleteVehicle
 {
-    private readonly IMapper _mapper;
+    private readonly Mock<IVehicleRepository> _vehicleRepositoryMock;
+    private readonly Mock<IUserAccessor> _userAccessorMock;
+    private readonly VehicleService _vehicleService;
 
     public DeleteVehicle()
     {
-        _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
+
+        _vehicleRepositoryMock = new();
+        _userAccessorMock = new();
+
+        _vehicleService = new(_vehicleRepositoryMock.Object, mapper, _userAccessorMock.Object);
     }
 
     [Fact]
@@ -28,13 +35,10 @@ public class DeleteVehicle
         var vehicleRepositoryMock = new Mock<IVehicleRepository>();
         var vehicleId = Guid.NewGuid();
 
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
 
         // Act
-        var result = vehicleService.DeleteVehicle(vehicleId);
+        var result = _vehicleService.DeleteVehicle(vehicleId);
 
         // Assert
         Assert.False(result);
@@ -47,16 +51,12 @@ public class DeleteVehicle
         var vehicleId = Guid.NewGuid();
 
         var user = new User();
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns<Department?>(null);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns<Department?>(null);
 
         // Act
-        var result = vehicleService.DeleteVehicle(vehicleId);
+        var result = _vehicleService.DeleteVehicle(vehicleId);
 
         // Assert
         Assert.False(result);
@@ -70,22 +70,15 @@ public class DeleteVehicle
 
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var managerId = Guid.NewGuid();
-        var department = new Department
-        {
-            ManagerId = managerId,
-        };
+        var department = new Department { ManagerId = managerId };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
 
         // Act
-        var result = vehicleService.DeleteVehicle(vehicleId);
+        var result = _vehicleService.DeleteVehicle(vehicleId);
 
         // Assert
         Assert.False(result);
@@ -99,19 +92,15 @@ public class DeleteVehicle
 
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var department = new Department { ManagerId = userId };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
-        vehicleRepositoryMock.Setup(x => x.DeleteVehicle(vehicleId)).Returns(true);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.DeleteVehicle(vehicleId)).Returns(true);
 
         // Act
-        var result = vehicleService.DeleteVehicle(vehicleId);
+        var result = _vehicleService.DeleteVehicle(vehicleId);
 
         // Assert
         Assert.True(result);

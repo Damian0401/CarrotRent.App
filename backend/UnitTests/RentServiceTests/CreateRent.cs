@@ -13,29 +13,31 @@ namespace UnitTests.RentServiceTests;
 
 public class CreateRent
 {
-    private readonly IMapper _mapper;
+    private readonly Mock<IUserAccessor> _userAccessorMock;
+    private readonly Mock<IRentRepository> _rentRepositoryMock;
+    private readonly RentService _rentService;
 
     public CreateRent()
     {
-        _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
+
+        _userAccessorMock = new();
+        _rentRepositoryMock = new();
+
+        _rentService = new(mapper, _userAccessorMock.Object, _rentRepositoryMock.Object);
     }
 
     [Fact]
     public void CreateRent_UserNotLogged_ReturnsFalse()
     {
         // Arrange
-        var rentRepositoryMock = new Mock<IRentRepository>();
-
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
 
         var dto = new CreateRentDtoRequest();
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
-
         // Act
-        var result = rentService.CreateRent(dto);
+        var result = _rentService.CreateRent(dto);
 
         // Assert
         Assert.False(result);
@@ -48,18 +50,15 @@ public class CreateRent
     public void CreateRent_UserIsNotClient_ReturnsFalse(string userRoleName)
     {
         // Arrange
-        var rentRepositoryMock = new Mock<IRentRepository>();
         var dto = new CreateRentDtoRequest();
 
         var userRole = new Role { Name = userRoleName };
         var user = new User { Role = userRole };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         // Act
-        var result = rentService.CreateRent(dto);
+        var result = _rentService.CreateRent(dto);
 
         // Assert
         Assert.False(result);
@@ -73,16 +72,13 @@ public class CreateRent
 
         var userRole = new Role { Name = Roles.Client };
         var user = new User { Role = userRole };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns<Guid?>(null);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns<Guid?>(null);
 
         // Act
-        var result = rentService.CreateRent(dto);
+        var result = _rentService.CreateRent(dto);
 
         // Assert
         Assert.False(result);
@@ -96,18 +92,16 @@ public class CreateRent
 
         var userRole = new Role { Name = Roles.Client };
         var user = new User { Role = userRole };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var reservedRentStatusId = Guid.NewGuid();
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(reservedRentStatusId);
-        rentRepositoryMock.Setup(x => x.CreateRent(It.IsAny<Rent>())).Returns(false);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(reservedRentStatusId);
+        _rentRepositoryMock.Setup(x => x.CreateRent(It.IsAny<Rent>())).Returns(false);
 
         // Act
-        var result = rentService.CreateRent(dto);
+        var result = _rentService.CreateRent(dto);
 
         // Assert
         Assert.False(result);
@@ -121,18 +115,16 @@ public class CreateRent
 
         var userRole = new Role { Name = Roles.Client };
         var user = new User { Role = userRole };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var reservedRentStatusId = Guid.NewGuid();
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(reservedRentStatusId);
-        rentRepositoryMock.Setup(x => x.CreateRent(It.IsAny<Rent>())).Returns(true);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(reservedRentStatusId);
+        _rentRepositoryMock.Setup(x => x.CreateRent(It.IsAny<Rent>())).Returns(true);
 
         // Act
-        var result = rentService.CreateRent(dto);
+        var result = _rentService.CreateRent(dto);
 
         // Assert
         Assert.True(result);

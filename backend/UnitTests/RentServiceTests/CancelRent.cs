@@ -13,28 +13,31 @@ namespace UnitTests.RentServiceTests;
 
 public class CancelRent
 {
-    private readonly IMapper _mapper;
+    private readonly Mock<IUserAccessor> _userAccessorMock;
+    private readonly Mock<IRentRepository> _rentRepositoryMock;
+    private readonly RentService _rentService;
 
     public CancelRent()
     {
-        _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
+
+        _userAccessorMock = new();
+        _rentRepositoryMock = new();
+
+        _rentService = new(mapper, _userAccessorMock.Object, _rentRepositoryMock.Object);
     }
 
     [Fact]
     public void CancelRent_RentNotFound_ReturnsFalse()
     {
         // Arrange
-        var userAccessorMock = new Mock<IUserAccessor>();
-
         var rentId = Guid.NewGuid();
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns<Rent?>(null);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns<Rent?>(null);
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.False(result);
@@ -48,14 +51,12 @@ public class CancelRent
 
         var rentId = Guid.NewGuid();
         var rent = new Rent { Id = rentId };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
-        rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns<Guid?>(null);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
+        _rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns<Guid?>(null);
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.False(result);
@@ -68,17 +69,14 @@ public class CancelRent
         var rentId = Guid.NewGuid();
         var rent = new Rent { Id = rentId };
         var departmentId = Guid.NewGuid();
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
-        rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
 
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
+        _rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.False(result);
@@ -95,8 +93,6 @@ public class CancelRent
             Id = userId,
             Role = userRole
         };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rent = new Rent
@@ -106,15 +102,15 @@ public class CancelRent
         };
 
         var departmentId = Guid.NewGuid();
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
-        rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns<Department?>(null);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
+        _rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns<Department?>(null);
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.False(result);
@@ -131,8 +127,8 @@ public class CancelRent
             Id = userId,
             Role = userRole
         };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rent = new Rent
@@ -148,15 +144,13 @@ public class CancelRent
             Employees = new List<User>(),
             ManagerId = managerId
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
-        rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
+        _rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.False(result);
@@ -173,8 +167,8 @@ public class CancelRent
             Id = userId,
             Role = userRole
         };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rentStatusId = Guid.NewGuid();
@@ -192,16 +186,14 @@ public class CancelRent
             Employees = new List<User>(),
             ManagerId = managerId
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
-        rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(Guid.NewGuid());
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
+        _rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(Guid.NewGuid());
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.False(result);
@@ -218,8 +210,8 @@ public class CancelRent
             Id = userId,
             Role = userRole
         };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rentStatusId = Guid.NewGuid();
@@ -237,17 +229,15 @@ public class CancelRent
             Employees = new List<User>(),
             ManagerId = managerId
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
-        rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(rentStatusId);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Archived)).Returns<Guid?>(null);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
+        _rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(rentStatusId);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Archived)).Returns<Guid?>(null);
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.False(result);
@@ -264,8 +254,8 @@ public class CancelRent
             Id = userId,
             Role = userRole
         };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rentStatusId = Guid.NewGuid();
@@ -283,18 +273,16 @@ public class CancelRent
             Employees = new List<User>(),
             ManagerId = managerId
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
-        rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(rentStatusId);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Archived)).Returns(Guid.NewGuid());
-        rentRepositoryMock.Setup(x => x.UpdateRent(rent)).Returns(false);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
+        _rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(rentStatusId);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Archived)).Returns(Guid.NewGuid());
+        _rentRepositoryMock.Setup(x => x.UpdateRent(rent)).Returns(false);
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.False(result);
@@ -311,8 +299,8 @@ public class CancelRent
             Id = userId,
             Role = userRole
         };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rentStatusId = Guid.NewGuid();
@@ -329,18 +317,16 @@ public class CancelRent
             Employees = new List<User>(),
             ManagerId = userId
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
-        rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(rentStatusId);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Archived)).Returns(Guid.NewGuid());
-        rentRepositoryMock.Setup(x => x.UpdateRent(rent)).Returns(true);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
+        _rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(rentStatusId);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Archived)).Returns(Guid.NewGuid());
+        _rentRepositoryMock.Setup(x => x.UpdateRent(rent)).Returns(true);
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.True(result);
@@ -357,8 +343,8 @@ public class CancelRent
             Id = userId,
             Role = userRole
         };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rentStatusId = Guid.NewGuid();
@@ -376,18 +362,16 @@ public class CancelRent
             Employees = new List<User> { new User { Id = userId } },
             ManagerId = managerId
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
-        rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(rentStatusId);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Archived)).Returns(Guid.NewGuid());
-        rentRepositoryMock.Setup(x => x.UpdateRent(rent)).Returns(true);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
+        _rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(rentStatusId);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Archived)).Returns(Guid.NewGuid());
+        _rentRepositoryMock.Setup(x => x.UpdateRent(rent)).Returns(true);
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.True(result);
@@ -404,8 +388,8 @@ public class CancelRent
             Id = userId,
             Role = userRole
         };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rentStatusId = Guid.NewGuid();
@@ -423,18 +407,16 @@ public class CancelRent
             Employees = new List<User>(),
             ManagerId = managerId
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
-        rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(rentStatusId);
-        rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Archived)).Returns(Guid.NewGuid());
-        rentRepositoryMock.Setup(x => x.UpdateRent(rent)).Returns(true);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
+        _rentRepositoryMock.Setup(x => x.GetRentDepartmentId(rentId)).Returns(departmentId);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(rentStatusId);
+        _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Archived)).Returns(Guid.NewGuid());
+        _rentRepositoryMock.Setup(x => x.UpdateRent(rent)).Returns(true);
 
         // Act
-        var result = rentService.CancelRent(rentId);
+        var result = _rentService.CancelRent(rentId);
 
         // Assert
         Assert.True(result);

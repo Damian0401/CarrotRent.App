@@ -13,28 +13,31 @@ namespace UnitTests.RentServiceTests;
 
 public class GetDepartmentArchivedRents
 {
-    private readonly IMapper _mapper;
+    private readonly Mock<IUserAccessor> _userAccessorMock;
+    private readonly Mock<IRentRepository> _rentRepositoryMock;
+    private readonly RentService _rentService;
 
     public GetDepartmentArchivedRents()
     {
-        _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
+
+        _userAccessorMock = new();
+        _rentRepositoryMock = new();
+
+        _rentService = new(mapper, _userAccessorMock.Object, _rentRepositoryMock.Object);
     }
 
     [Fact]
     public void GetDepartmentArchivedRents_UserNotLogged_ReturnsNull()
     {
         // Arrange
-        var rentRepositoryMock = new Mock<IRentRepository>();
         var departmentId = Guid.NewGuid();
 
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
-
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
 
         // Act
-        var result = rentService.GetDepartmentArchivedRents(departmentId);
+        var result = _rentService.GetDepartmentArchivedRents(departmentId);
 
         // Assert
         Assert.Null(result);
@@ -47,16 +50,13 @@ public class GetDepartmentArchivedRents
         var departmentId = Guid.NewGuid();
 
         var user = new User();
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns<Department?>(null);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns<Department?>(null);
 
         // Act
-        var result = rentService.GetDepartmentArchivedRents(departmentId);
+        var result = _rentService.GetDepartmentArchivedRents(departmentId);
 
         // Assert
         Assert.Null(result);
@@ -68,8 +68,8 @@ public class GetDepartmentArchivedRents
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var departmentId = Guid.NewGuid();
         var department = new Department
@@ -79,14 +79,12 @@ public class GetDepartmentArchivedRents
         };
 
         var rents = new List<Rent>();
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        rentRepositoryMock.Setup(x => x.GetDepartmentArchivedRents(departmentId)).Returns(rents);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentArchivedRents(departmentId)).Returns(rents);
 
         // Act
-        var result = rentService.GetDepartmentArchivedRents(departmentId);
+        var result = _rentService.GetDepartmentArchivedRents(departmentId);
 
         // Assert
         Assert.NotNull(result);
@@ -98,8 +96,8 @@ public class GetDepartmentArchivedRents
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var managerId = Guid.NewGuid();
         var departmentId = Guid.NewGuid();
@@ -110,14 +108,12 @@ public class GetDepartmentArchivedRents
         };
 
         var rents = new List<Rent>();
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        rentRepositoryMock.Setup(x => x.GetDepartmentArchivedRents(departmentId)).Returns(rents);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentArchivedRents(departmentId)).Returns(rents);
 
         // Act
-        var result = rentService.GetDepartmentArchivedRents(departmentId);
+        var result = _rentService.GetDepartmentArchivedRents(departmentId);
 
         // Assert
         Assert.NotNull(result);
@@ -132,8 +128,8 @@ public class GetDepartmentArchivedRents
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var departmentId = Guid.NewGuid();
         var department = new Department
@@ -145,14 +141,11 @@ public class GetDepartmentArchivedRents
         var rents = new List<Rent>();
         Enumerable.Range(0, rentNumber).ToList().ForEach(_ => rents.Add(new Rent()));
 
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        rentRepositoryMock.Setup(x => x.GetDepartmentArchivedRents(departmentId)).Returns(rents);
-
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentArchivedRents(departmentId)).Returns(rents);
 
         // Act
-        var result = rentService.GetDepartmentArchivedRents(departmentId);
+        var result = _rentService.GetDepartmentArchivedRents(departmentId);
 
         // Assert
         Assert.Equal(rentNumber, result!.Rents.Count);

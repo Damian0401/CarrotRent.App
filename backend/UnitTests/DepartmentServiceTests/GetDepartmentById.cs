@@ -7,51 +7,49 @@ using Domain.Models;
 using Moq;
 using Xunit;
 
-namespace UnitTests.DepartmentServiceTests
+namespace UnitTests.DepartmentServiceTests;
+
+public class GetDepartmentById
 {
-    public class GetDepartmentById
+    private readonly Mock<IDepartmentRepository> _departmentRepositoryMock;
+    private readonly DepartmentService _departmentService;
+
+    public GetDepartmentById()
     {
-        private readonly IMapper _mapper;
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+            .CreateMapper();
 
-        public GetDepartmentById()
-        {
-            _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
-                .CreateMapper();
-        }
+        _departmentRepositoryMock = new();
 
-        [Fact]
-        public void GetDepartmentById_DepartmentNotFound_ReturnsNull()
-        {
-            // Arrange
-            var departmentId = Guid.NewGuid();
-            var departmentRepositoryMock = new Mock<IDepartmentRepository>();
-            departmentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns<Department?>(null);
+        _departmentService = new(_departmentRepositoryMock.Object, mapper);
+    }
 
-            var departmentService = new DepartmentService(departmentRepositoryMock.Object, _mapper);
+    [Fact]
+    public void GetDepartmentById_DepartmentNotFound_ReturnsNull()
+    {
+        // Arrange
+        var departmentId = Guid.NewGuid();
+        _departmentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns<Department?>(null);
 
-            // Act
-            var result =  departmentService.GetDepartmentById(departmentId);
+        // Act
+        var result =  _departmentService.GetDepartmentById(departmentId);
 
-            // Assert
-            Assert.Null(result);
-        }
+        // Assert
+        Assert.Null(result);
+    }
 
-        [Fact]
-        public void GetDepartmentById_CorrectRequest_ReturnsResult()
-        {
-            // Arrange
-            var departmentId = Guid.NewGuid();
-            var department = new Department();
-            var departmentRepositoryMock = new Mock<IDepartmentRepository>();
-            departmentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
+    [Fact]
+    public void GetDepartmentById_CorrectRequest_ReturnsResult()
+    {
+        // Arrange
+        var departmentId = Guid.NewGuid();
+        var department = new Department();
+        _departmentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
 
-            var departmentService = new DepartmentService(departmentRepositoryMock.Object, _mapper);
+        // Act
+        var result = _departmentService.GetDepartmentById(departmentId);
 
-            // Act
-            var result =  departmentService.GetDepartmentById(departmentId);
-
-            // Assert
-            Assert.NotNull(result);
-        }
+        // Assert
+        Assert.NotNull(result);
     }
 }

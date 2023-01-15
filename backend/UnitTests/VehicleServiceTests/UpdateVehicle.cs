@@ -13,12 +13,19 @@ namespace UnitTests.VehicleServiceTests;
 
 public class UpdateVehicle
 {
-    private readonly IMapper _mapper;
+    private readonly Mock<IVehicleRepository> _vehicleRepositoryMock;
+    private readonly Mock<IUserAccessor> _userAccessorMock;
+    private readonly VehicleService _vehicleService;
 
     public UpdateVehicle()
     {
-        _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
+
+        _vehicleRepositoryMock = new();
+        _userAccessorMock = new();
+
+        _vehicleService = new(_vehicleRepositoryMock.Object, mapper, _userAccessorMock.Object);
     }
 
     [Fact]
@@ -29,13 +36,10 @@ public class UpdateVehicle
         var dto = new UpdateVehicleDtoRequest();
         var vehicleId = Guid.NewGuid();
 
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
 
         // Act
-        var result = vehicleService.UpdateVehicle(vehicleId, dto);
+        var result = _vehicleService.UpdateVehicle(vehicleId, dto);
 
         // Assert
         Assert.False(result);
@@ -49,16 +53,12 @@ public class UpdateVehicle
         var vehicleId = Guid.NewGuid();
 
         var user = new User();
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns<Department?>(null);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns<Department?>(null);
 
         // Act
-        var result = vehicleService.UpdateVehicle(vehicleId, dto);
+        var result = _vehicleService.UpdateVehicle(vehicleId, dto);
 
         // Assert
         Assert.False(result);
@@ -73,8 +73,7 @@ public class UpdateVehicle
 
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var managerId = Guid.NewGuid();
         var department = new Department
@@ -83,13 +82,10 @@ public class UpdateVehicle
             ManagerId = managerId,
         };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
 
         // Act
-        var result = vehicleService.UpdateVehicle(vehicleId, dto);
+        var result = _vehicleService.UpdateVehicle(vehicleId, dto);
 
         // Assert
         Assert.False(result);
@@ -104,8 +100,7 @@ public class UpdateVehicle
 
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var department = new Department
         {
@@ -113,14 +108,11 @@ public class UpdateVehicle
             ManagerId = userId,
         };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
-        vehicleRepositoryMock.Setup(x => x.UpdateVehicle(vehicleId, It.IsAny<Vehicle>())).Returns(true);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.UpdateVehicle(vehicleId, It.IsAny<Vehicle>())).Returns(true);
 
         // Act
-        var result = vehicleService.UpdateVehicle(vehicleId, dto);
+        var result = _vehicleService.UpdateVehicle(vehicleId, dto);
 
         // Assert
         Assert.True(result);
@@ -135,8 +127,7 @@ public class UpdateVehicle
 
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var managerId = Guid.NewGuid();
         var employees = new List<User> { user };
@@ -146,14 +137,11 @@ public class UpdateVehicle
             ManagerId = managerId,
         };
 
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
-        vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
-        vehicleRepositoryMock.Setup(x => x.UpdateVehicle(vehicleId, It.IsAny<Vehicle>())).Returns(true);
-
-        var vehicleService = new VehicleService(vehicleRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.UpdateVehicle(vehicleId, It.IsAny<Vehicle>())).Returns(true);
 
         // Act
-        var result = vehicleService.UpdateVehicle(vehicleId, dto);
+        var result = _vehicleService.UpdateVehicle(vehicleId, dto);
 
         // Assert
         Assert.True(result);

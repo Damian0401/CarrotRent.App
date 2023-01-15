@@ -9,6 +9,16 @@ namespace UnitTests.JwtGeneratorTests;
 
 public class CreateToken
 {
+    private readonly Mock<IConfiguration> _configurationMock;
+    private readonly JwtGenerator _jwtGenerator;
+
+    public CreateToken()
+    {
+        _configurationMock = new();
+
+        _jwtGenerator = new(_configurationMock.Object);
+    }
+
     [Theory]
     [InlineData("super secret key 1", "super secret key 2")]
     [InlineData("1234567890987654321", "0987654321234567890")]
@@ -51,10 +61,6 @@ public class CreateToken
         var expireDate = DateTime.Now.AddDays(1);
         var role = new Role() { Name = "UserRole" };
 
-        var configurationMock = new Mock<IConfiguration>();
-        configurationMock.Setup(c => c["Jwt:Key"]).Returns("super secret key");
-        var jwtGenerator = new JwtGenerator(configurationMock.Object);
-
         var user1 = new User
         {
             Id = Guid.NewGuid(),
@@ -69,10 +75,11 @@ public class CreateToken
             Role = role
         };
 
+        _configurationMock.Setup(c => c["Jwt:Key"]).Returns("super secret key");
 
         // Act
-        var token1 = jwtGenerator.CreateToken(user1, expireDate);
-        var token2 = jwtGenerator.CreateToken(user2, expireDate);
+        var token1 = _jwtGenerator.CreateToken(user1, expireDate);
+        var token2 = _jwtGenerator.CreateToken(user2, expireDate);
 
         // Assert
         Assert.NotEqual(token1, token2);
@@ -91,13 +98,11 @@ public class CreateToken
             Role = role
         };
 
-        var configurationMock = new Mock<IConfiguration>();
-        configurationMock.Setup(c => c["Jwt:Key"]).Returns("super secret key");
-        var jwtGenerator = new JwtGenerator(configurationMock.Object);
+        _configurationMock.Setup(c => c["Jwt:Key"]).Returns("super secret key");
 
         // Act
-        var token1 = jwtGenerator.CreateToken(user, expireDate);
-        var token2 = jwtGenerator.CreateToken(user, expireDate);
+        var token1 = _jwtGenerator.CreateToken(user, expireDate);
+        var token2 = _jwtGenerator.CreateToken(user, expireDate);
 
         // Assert
         Assert.Equal(token1, token2);

@@ -13,12 +13,22 @@ namespace UnitTests.AccountServiceTests;
 
 public class Login
 {
-    private readonly IMapper _mapper;
+    private readonly Mock<IAccountRepository> _accountRepositoryMock;
+    private readonly Mock<IUserAccessor> _userAccessorMock;
+    private readonly Mock<IJwtGenerator> _JwtGeneratorMock;
+    private readonly AccountService _accountService;
 
     public Login()
     {
-        _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
+
+        _accountRepositoryMock = new();
+        _userAccessorMock = new();
+        _JwtGeneratorMock = new();
+
+        _accountService = new AccountService(_accountRepositoryMock.Object, mapper,
+            _JwtGeneratorMock.Object, _userAccessorMock.Object);
     }
 
     [Theory]
@@ -32,14 +42,7 @@ public class Login
         var hasher = new PasswordHasher<User>();
         user.PasswordHash = hasher.HashPassword(user, userPassword);
 
-        var jwtGeneratorMock = new Mock<IJwtGenerator>();
-        var userAccessorMock = new Mock<IUserAccessor>();
-
-        var accountRepositoryMock = new Mock<IAccountRepository>();
-        accountRepositoryMock.Setup(x => x.GetUserByLogin(It.IsAny<string>())).Returns(user);
-
-        var accountService = new AccountService(accountRepositoryMock.Object,
-            _mapper, jwtGeneratorMock.Object, userAccessorMock.Object);
+        _accountRepositoryMock.Setup(x => x.GetUserByLogin(It.IsAny<string>())).Returns(user);
 
         var request = new LoginDtoRequest
         {
@@ -48,7 +51,7 @@ public class Login
         };
 
         // Act
-        var result = accountService.Login(request);
+        var result = _accountService.Login(request);
 
         // Assert
         Assert.Null(result);
@@ -64,13 +67,10 @@ public class Login
         var jwtGeneratorMock = new Mock<IJwtGenerator>();
         var userAccessorMock = new Mock<IUserAccessor>();
 
-        var accountService = new AccountService(accountRepositoryMock.Object,
-            _mapper, jwtGeneratorMock.Object, userAccessorMock.Object);
-
         var request = new LoginDtoRequest { Login = "UserLogin" };
 
         // Act
-        var result = accountService.Login(request);
+        var result = _accountService.Login(request);
 
         // Assert
         Assert.Null(result);
@@ -90,16 +90,12 @@ public class Login
         var jwtGeneratorMock = new Mock<IJwtGenerator>();
         var userAccessorMock = new Mock<IUserAccessor>();
 
-        var accountRepositoryMock = new Mock<IAccountRepository>();
-        accountRepositoryMock.Setup(x => x.GetUserByLogin(It.IsAny<string>())).Returns(user);
-
-        var accountService = new AccountService(accountRepositoryMock.Object,
-            _mapper, jwtGeneratorMock.Object, userAccessorMock.Object);
+        _accountRepositoryMock.Setup(x => x.GetUserByLogin(It.IsAny<string>())).Returns(user);
 
         var request = new LoginDtoRequest { Password = userPassword };
 
         // Act
-        var result = accountService.Login(request);
+        var result = _accountService.Login(request);
 
         // Assert
         Assert.NotNull(result);
@@ -118,14 +114,7 @@ public class Login
         var hasher = new PasswordHasher<User>();
         user.PasswordHash = hasher.HashPassword(user, password);
 
-        var jwtGeneratorMock = new Mock<IJwtGenerator>();
-        var userAccessorMock = new Mock<IUserAccessor>();
-
-        var accountRepositoryMock = new Mock<IAccountRepository>();
-        accountRepositoryMock.Setup(x => x.GetUserByLogin(userLogin)).Returns(user);
-
-        var accountService = new AccountService(accountRepositoryMock.Object,
-            _mapper, jwtGeneratorMock.Object, userAccessorMock.Object);
+        _accountRepositoryMock.Setup(x => x.GetUserByLogin(userLogin)).Returns(user);
 
         var request = new LoginDtoRequest
         {
@@ -134,7 +123,7 @@ public class Login
         };
 
         // Act
-        var result = accountService.Login(request);
+        var result = _accountService.Login(request);
 
         // Assert
         Assert.Equal(userLogin, result!.Login);

@@ -11,12 +11,19 @@ namespace UnitTests.RentServiceTests;
 
 public class GetRentById
 {
-    private readonly IMapper _mapper;
+    private readonly Mock<IUserAccessor> _userAccessorMock;
+    private readonly Mock<IRentRepository> _rentRepositoryMock;
+    private readonly RentService _rentService;
 
     public GetRentById()
     {
-        _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
+
+        _userAccessorMock = new();
+        _rentRepositoryMock = new();
+
+        _rentService = new(mapper, _userAccessorMock.Object, _rentRepositoryMock.Object);
     }
 
     [Fact]
@@ -24,15 +31,11 @@ public class GetRentById
     {
         // Arrange
         var rentId = Guid.NewGuid();
-        var rentRepositoryMock = new Mock<IRentRepository>();
 
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
-
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
 
         // Act
-        var result = rentService.GetRentById(rentId);
+        var result = _rentService.GetRentById(rentId);
 
         // Assert
         Assert.Null(result);
@@ -43,17 +46,15 @@ public class GetRentById
     {
         // Arrange
         var user = new User();
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns<Rent?>(null);
-
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns<Rent?>(null);
 
         // Act
-        var result = rentService.GetRentById(rentId);
+        var result = _rentService.GetRentById(rentId);
 
         // Assert
         Assert.Null(result);
@@ -65,8 +66,8 @@ public class GetRentById
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rent = new Rent
@@ -75,13 +76,11 @@ public class GetRentById
             ReceiverId = Guid.NewGuid(),
             RenterId = Guid.NewGuid(),
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
 
         // Act
-        var result = rentService.GetRentById(rentId);
+        var result = _rentService.GetRentById(rentId);
 
         // Assert
         Assert.Null(result);
@@ -93,8 +92,8 @@ public class GetRentById
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rent = new Rent
@@ -103,13 +102,11 @@ public class GetRentById
             ReceiverId = Guid.NewGuid(),
             RenterId = Guid.NewGuid(),
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
 
         // Act
-        var result = rentService.GetRentById(rentId);
+        var result = _rentService.GetRentById(rentId);
 
         // Assert
         Assert.NotNull(result);
@@ -121,8 +118,8 @@ public class GetRentById
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rent = new Rent
@@ -131,13 +128,11 @@ public class GetRentById
             ReceiverId = Guid.NewGuid(),
             RenterId = userId,
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
 
         // Act
-        var result = rentService.GetRentById(rentId);
+        var result = _rentService.GetRentById(rentId);
 
         // Assert
         Assert.NotNull(result);
@@ -149,8 +144,8 @@ public class GetRentById
         // Arrange
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rentId = Guid.NewGuid();
         var rent = new Rent
@@ -159,13 +154,11 @@ public class GetRentById
             ReceiverId = userId,
             RenterId = Guid.NewGuid(),
         };
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetRentById(rentId)).Returns(rent);
 
         // Act
-        var result = rentService.GetRentById(rentId);
+        var result = _rentService.GetRentById(rentId);
 
         // Assert
         Assert.NotNull(result);

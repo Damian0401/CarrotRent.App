@@ -14,27 +14,29 @@ namespace UnitTests.RentServiceTests;
 
 public class GetMyArchivedRents
 {
-    private readonly IMapper _mapper;
+    private readonly Mock<IUserAccessor> _userAccessorMock;
+    private readonly Mock<IRentRepository> _rentRepositoryMock;
+    private readonly RentService _rentService;
 
     public GetMyArchivedRents()
     {
-        _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
+
+        _userAccessorMock = new();
+        _rentRepositoryMock = new();
+
+        _rentService = new(mapper, _userAccessorMock.Object, _rentRepositoryMock.Object);
     }
 
     [Fact]
     public void GetMyArchivedRents_UserNotLogged_ReturnsNull()
     {
         // Arrange
-        var rentRepositoryMock = new Mock<IRentRepository>();
-
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
-
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
 
         // Act
-        var result = rentService.GetMyArchivedRents();
+        var result = _rentService.GetMyArchivedRents();
 
         // Assert
         Assert.Null(result);
@@ -47,17 +49,13 @@ public class GetMyArchivedRents
     public void GetMyArchivedRents_UserNotClient_ReturnsNull(string userRoleName)
     {
         // Arrange
-        var rentRepositoryMock = new Mock<IRentRepository>();
-
         var userRole = new Role { Name = userRoleName };
         var user = new User { Role = userRole };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         // Act
-        var result = rentService.GetMyArchivedRents();
+        var result = _rentService.GetMyArchivedRents();
 
         // Assert
         Assert.Null(result);
@@ -74,17 +72,15 @@ public class GetMyArchivedRents
             Id = userId,
             Role = userRole
         };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rents = new List<Rent>();
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetUserArchivedRents(userId)).Returns(rents);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetUserArchivedRents(userId)).Returns(rents);
 
         // Act
-        var result = rentService.GetMyArchivedRents();
+        var result = _rentService.GetMyArchivedRents();
 
         // Assert
         Assert.NotNull(result);
@@ -104,18 +100,16 @@ public class GetMyArchivedRents
             Id = userId,
             Role = userRole
         };
-        var userAccessorMock = new Mock<IUserAccessor>();
-        userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var rents = new List<Rent>();
         Enumerable.Range(0, rentNumber).ToList().ForEach(_ => rents.Add(new Rent()));
-        var rentRepositoryMock = new Mock<IRentRepository>();
-        rentRepositoryMock.Setup(x => x.GetUserArchivedRents(userId)).Returns(rents);
 
-        var rentService = new RentService(_mapper, userAccessorMock.Object, rentRepositoryMock.Object);
+        _rentRepositoryMock.Setup(x => x.GetUserArchivedRents(userId)).Returns(rents);
 
         // Act
-        var result = rentService.GetMyArchivedRents();
+        var result = _rentService.GetMyArchivedRents();
 
         // Assert
         Assert.Equal(rentNumber, result!.Rents.Count);

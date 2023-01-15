@@ -7,53 +7,53 @@ using Domain.Models;
 using Moq;
 using Xunit;
 
-namespace UnitTests.VehicleServiceTests
+namespace UnitTests.VehicleServiceTests;
+
+public class GetVehicleById
 {
-    public class GetVehicleById
+    private readonly Mock<IVehicleRepository> _vehicleRepositoryMock;
+    private readonly Mock<IUserAccessor> _userAccessorMock;
+    private readonly VehicleService _vehicleService;
+
+    public GetVehicleById()
     {
-        private readonly IMapper _mapper;
+        var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
+            .CreateMapper();
 
-        public GetVehicleById()
-        {
-            _mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
-                .CreateMapper();
-        }
+        _vehicleRepositoryMock = new();
+        _userAccessorMock = new();
 
-        [Fact]
-        public void GetVehicleById_DepartmentNotFound_ReturnsNull()
-        {
-            // Arrange
-            var userAccessorMock = new Mock<IUserAccessor>();
-            var vehicleId = Guid.NewGuid();
-            var departmentRepositoryMock = new Mock<IVehicleRepository>();
-            departmentRepositoryMock.Setup(x => x.GetVehicleById(vehicleId)).Returns<Vehicle?>(null);
+        _vehicleService = new(_vehicleRepositoryMock.Object, mapper, _userAccessorMock.Object);
+    }
 
-            var departmentService = new VehicleService(departmentRepositoryMock.Object, _mapper, userAccessorMock.Object);
+    [Fact]
+    public void GetVehicleById_DepartmentNotFound_ReturnsNull()
+    {
+        // Arrange
+        var userAccessorMock = new Mock<IUserAccessor>();
+        var vehicleId = Guid.NewGuid();
+        _vehicleRepositoryMock.Setup(x => x.GetVehicleById(vehicleId)).Returns<Vehicle?>(null);
 
-            // Act
-            var result =  departmentService.GetVehicleById(vehicleId);
+        // Act
+        var result = _vehicleService.GetVehicleById(vehicleId);
 
-            // Assert
-            Assert.Null(result);
-        }
+        // Assert
+        Assert.Null(result);
+    }
 
-        [Fact]
-        public void GetVehicleById_CorrectRequest_ReturnsResult()
-        {
-            // Arrange
-            var userAccessorMock = new Mock<IUserAccessor>();
-            var vehicleId = Guid.NewGuid();
-            var vehicle = new Vehicle();
-            var departmentRepositoryMock = new Mock<IVehicleRepository>();
-            departmentRepositoryMock.Setup(x => x.GetVehicleById(vehicleId)).Returns(vehicle);
+    [Fact]
+    public void GetVehicleById_CorrectRequest_ReturnsResult()
+    {
+        // Arrange
+        var userAccessorMock = new Mock<IUserAccessor>();
+        var vehicleId = Guid.NewGuid();
+        var vehicle = new Vehicle();
+        _vehicleRepositoryMock.Setup(x => x.GetVehicleById(vehicleId)).Returns(vehicle);
 
-            var departmentService = new VehicleService(departmentRepositoryMock.Object, _mapper, userAccessorMock.Object);
+        // Act
+        var result = _vehicleService.GetVehicleById(vehicleId);
 
-            // Act
-            var result =  departmentService.GetVehicleById(vehicleId);
-
-            // Assert
-            Assert.NotNull(result);
-        }
+        // Assert
+        Assert.NotNull(result);
     }
 }
