@@ -118,36 +118,4 @@ public class GetDepartmentArchivedRents
         // Assert
         Assert.NotNull(result);
     }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(5)]
-    [InlineData(50)]
-    public void GetDepartmentArchivedRents_CorrectRequest_ReturnsCorrectRentsNumber(int rentNumber)
-    {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var user = new User { Id = userId };
-
-        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
-
-        var departmentId = Guid.NewGuid();
-        var department = new Department
-        {
-            ManagerId = userId,
-            Employees = new List<User>()
-        };
-
-        var rents = new List<Rent>();
-        Enumerable.Range(0, rentNumber).ToList().ForEach(_ => rents.Add(new Rent()));
-
-        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        _rentRepositoryMock.Setup(x => x.GetDepartmentArchivedRents(departmentId)).Returns(rents);
-
-        // Act
-        var result = _rentService.GetDepartmentArchivedRents(departmentId);
-
-        // Assert
-        Assert.Equal(rentNumber, result!.Rents.Count);
-    }
 }

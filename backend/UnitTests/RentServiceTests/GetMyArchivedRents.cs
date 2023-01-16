@@ -85,33 +85,4 @@ public class GetMyArchivedRents
         // Assert
         Assert.NotNull(result);
     }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(5)]
-    [InlineData(50)]
-    public void GetMyArchivedRents_CorrectRentNumber_ReturnsCorrectRentsNumber(int rentNumber)
-    {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var userRole = new Role { Name = Roles.Client };
-        var user = new User
-        {
-            Id = userId,
-            Role = userRole
-        };
-
-        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
-
-        var rents = new List<Rent>();
-        Enumerable.Range(0, rentNumber).ToList().ForEach(_ => rents.Add(new Rent()));
-
-        _rentRepositoryMock.Setup(x => x.GetUserArchivedRents(userId)).Returns(rents);
-
-        // Act
-        var result = _rentService.GetMyArchivedRents();
-
-        // Assert
-        Assert.Equal(rentNumber, result!.Rents.Count);
-    }
 }

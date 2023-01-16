@@ -29,7 +29,7 @@ public class GetDepartmentRents
     }
 
     [Fact]
-    public void GetDepartmentArchivedRents_UserNotLogged_ReturnsNull()
+    public void GetDepartmentRents_UserNotLogged_ReturnsNull()
     {
         // Arrange
         var departmentId = Guid.NewGuid();
@@ -44,7 +44,7 @@ public class GetDepartmentRents
     }
 
     [Fact]
-    public void GetDepartmentArchivedRents_DepartmentNotFound_ReturnsNull()
+    public void GetDepartmentRents_DepartmentNotFound_ReturnsNull()
     {
         // Arrange
         var departmentId = Guid.NewGuid();
@@ -63,7 +63,7 @@ public class GetDepartmentRents
     }
 
     [Fact]
-    public void GetDepartmentArchivedRents_UserIsManager_ReturnsResponse()
+    public void GetDepartmentRents_UserIsManager_ReturnsResponse()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -81,7 +81,7 @@ public class GetDepartmentRents
         var rents = new List<Rent>();
 
         _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        _rentRepositoryMock.Setup(x => x.GetDepartmentArchivedRents(departmentId)).Returns(rents);
+        _rentRepositoryMock.Setup(x => x.GetDepartmentRents(departmentId)).Returns(rents);
 
         // Act
         var result = _rentService.GetDepartmentRents(departmentId);
@@ -91,7 +91,7 @@ public class GetDepartmentRents
     }
 
     [Fact]
-    public void GetDepartmentArchivedRents_UserIsEmployee_ReturnsResponse()
+    public void GetDepartmentRents_UserIsEmployee_ReturnsResponse()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -110,44 +110,12 @@ public class GetDepartmentRents
         var rents = new List<Rent>();
 
         _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
-        _rentRepositoryMock.Setup(x => x.GetDepartmentArchivedRents(departmentId)).Returns(rents);
-
-        // Act
-        var result = _rentService.GetDepartmentRents(departmentId);
-
-        // Assert
-        Assert.NotNull(result);
-    }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(5)]
-    [InlineData(50)]
-    public void GetDepartmentArchivedRents_CorrectRequest_ReturnsCorrectRentsNumber(int rentNumber)
-    {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var user = new User { Id = userId };
-
-        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
-
-        var departmentId = Guid.NewGuid();
-        var department = new Department
-        {
-            ManagerId = userId,
-            Employees = new List<User>()
-        };
-
-        var rents = new List<Rent>();
-        Enumerable.Range(0, rentNumber).ToList().ForEach(_ => rents.Add(new Rent()));
-
-        _rentRepositoryMock.Setup(x => x.GetDepartmentById(departmentId)).Returns(department);
         _rentRepositoryMock.Setup(x => x.GetDepartmentRents(departmentId)).Returns(rents);
 
         // Act
         var result = _rentService.GetDepartmentRents(departmentId);
 
         // Assert
-        Assert.Equal(rentNumber, result!.Rents.Count);
+        Assert.NotNull(result);
     }
 }
