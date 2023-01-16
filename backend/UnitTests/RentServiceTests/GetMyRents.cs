@@ -90,7 +90,7 @@ public class GetMyRents
     [InlineData(0)]
     [InlineData(5)]
     [InlineData(50)]
-    public void GetMyArchivedRents_CorrectRentNumber_ReturnsResult(int rentNumber)
+    public void GetMyArchivedRents_CorrectRentNumber_ReturnsCorrectRentsNumber(int rentNumber)
     {
         // Arrange
         var userId = Guid.NewGuid();

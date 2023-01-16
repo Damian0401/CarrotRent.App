@@ -123,7 +123,7 @@ public class GetDepartmentRents
     [InlineData(0)]
     [InlineData(5)]
     [InlineData(50)]
-    public void GetDepartmentArchivedRents_CorrectRequest_ReturnsResponse(int rentNumber)
+    public void GetDepartmentArchivedRents_CorrectRequest_ReturnsCorrectRentsNumber(int rentNumber)
     {
         // Arrange
         var userId = Guid.NewGuid();
