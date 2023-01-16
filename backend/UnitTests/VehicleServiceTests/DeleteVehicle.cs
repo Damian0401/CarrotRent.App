@@ -49,10 +49,9 @@ public class DeleteVehicle
     {
         // Arrange
         var vehicleId = Guid.NewGuid();
-
         var user = new User();
-        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
         _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns<Department?>(null);
 
         // Act
@@ -67,14 +66,12 @@ public class DeleteVehicle
     {
         // Arrange
         var vehicleId = Guid.NewGuid();
-
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
-
         var managerId = Guid.NewGuid();
         var department = new Department { ManagerId = managerId };
 
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
         _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
 
         // Act
@@ -89,13 +86,11 @@ public class DeleteVehicle
     {
         // Arrange
         var vehicleId = Guid.NewGuid();
-
         var userId = Guid.NewGuid();
         var user = new User { Id = userId };
-        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
-
         var department = new Department { ManagerId = userId };
 
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
         _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
         _vehicleRepositoryMock.Setup(x => x.DeleteVehicle(vehicleId)).Returns(true);
 
