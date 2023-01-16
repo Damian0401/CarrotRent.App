@@ -3,6 +3,7 @@ using Application.Dtos.Account;
 using Application.Interfaces;
 using Application.Services;
 using AutoMapper;
+using Domain.Models;
 using Moq;
 using Xunit;
 
@@ -139,12 +140,73 @@ public class Register
         _accountRepositoryMock.Setup(x => x.IsEmailAvailable(email)).Returns(true);
         _accountRepositoryMock.Setup(x => x.IsLoginAvailable(login)).Returns(true);
         _accountRepositoryMock.Setup(x => x.IsPeselAvailable(pesel)).Returns(true);
-        _accountRepositoryMock.Setup(x => x.IsPhoneNumberAvailable(phoneNumber)).Returns(false);
+        _accountRepositoryMock.Setup(x => x.IsPhoneNumberAvailable(phoneNumber)).Returns(true);
+        _accountRepositoryMock.Setup(x => x.CreateUser(It.IsAny<User>())).Returns(false);
 
         // Act
         var result = _accountService.Register(request);
 
         // Assert
         Assert.Null(result);
+    }
+
+    [Fact]
+    public void Register_CorrectRequest_ReturnsResponse()
+    {
+        // Arrange
+        var email = "RequestEmail";
+        var login = "RequestLogin";
+        var pesel = 1234567890;
+        var phoneNumber = "1234567890";
+        var request = new RegisterDtoRequest
+        {
+            Email = email,
+            Login = login,
+            Pesel = pesel,
+            PhoneNumber = phoneNumber,
+            Password = "UserPassword"
+        };
+
+        _accountRepositoryMock.Setup(x => x.IsEmailAvailable(email)).Returns(true);
+        _accountRepositoryMock.Setup(x => x.IsLoginAvailable(login)).Returns(true);
+        _accountRepositoryMock.Setup(x => x.IsPeselAvailable(pesel)).Returns(true);
+        _accountRepositoryMock.Setup(x => x.IsPhoneNumberAvailable(phoneNumber)).Returns(true);
+        _accountRepositoryMock.Setup(x => x.CreateUser(It.IsAny<User>())).Returns(true);
+
+        // Act
+        var result = _accountService.Register(request);
+
+        // Assert
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void Register_CorrectRequest_ReturnsCorrectLogin()
+    {
+        // Arrange
+        var email = "RequestEmail";
+        var login = "RequestLogin";
+        var pesel = 1234567890;
+        var phoneNumber = "1234567890";
+        var request = new RegisterDtoRequest
+        {
+            Email = email,
+            Login = login,
+            Pesel = pesel,
+            PhoneNumber = phoneNumber,
+            Password = "UserPassword"
+        };
+
+        _accountRepositoryMock.Setup(x => x.IsEmailAvailable(email)).Returns(true);
+        _accountRepositoryMock.Setup(x => x.IsLoginAvailable(login)).Returns(true);
+        _accountRepositoryMock.Setup(x => x.IsPeselAvailable(pesel)).Returns(true);
+        _accountRepositoryMock.Setup(x => x.IsPhoneNumberAvailable(phoneNumber)).Returns(true);
+        _accountRepositoryMock.Setup(x => x.CreateUser(It.IsAny<User>())).Returns(true);
+
+        // Act
+        var result = _accountService.Register(request);
+
+        // Assert
+        Assert.Equal(login, result!.Login);
     }
 }
