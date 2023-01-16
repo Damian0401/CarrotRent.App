@@ -42,7 +42,7 @@ public class GetVehicleById
     }
 
     [Fact]
-    public void GetVehicleById_CorrectRequest_ReturnsResult()
+    public void GetVehicleById_CorrectRequest_ReturnsResponse()
     {
         // Arrange
         var userAccessorMock = new Mock<IUserAccessor>();

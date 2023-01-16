@@ -255,7 +255,7 @@ public class CreateVehicle
     }
 
     [Fact]
-    public void CreateVehicle_CorrectRequest_ReturnsFalse()
+    public void CreateVehicle_CorrectRequest_ReturnsTrue()
     {
         // Arrange
         var userId = Guid.NewGuid();
