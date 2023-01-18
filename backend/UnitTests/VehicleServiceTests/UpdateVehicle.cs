@@ -32,7 +32,6 @@ public class UpdateVehicle
     public void UpdateVehicle_UserNotLogged_ReturnsFalse()
     {
         // Arrange
-        var vehicleRepositoryMock = new Mock<IVehicleRepository>();
         var dto = new UpdateVehicleDtoRequest();
         var vehicleId = Guid.NewGuid();
 

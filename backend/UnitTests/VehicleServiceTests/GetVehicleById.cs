@@ -27,10 +27,9 @@ public class GetVehicleById
     }
 
     [Fact]
-    public void GetVehicleById_DepartmentNotFound_ReturnsNull()
+    public void GetVehicleById_VehicleNotFound_ReturnsNull()
     {
         // Arrange
-        var userAccessorMock = new Mock<IUserAccessor>();
         var vehicleId = Guid.NewGuid();
         _vehicleRepositoryMock.Setup(x => x.GetVehicleById(vehicleId)).Returns<Vehicle?>(null);
 
@@ -45,7 +44,6 @@ public class GetVehicleById
     public void GetVehicleById_CorrectRequest_ReturnsResponse()
     {
         // Arrange
-        var userAccessorMock = new Mock<IUserAccessor>();
         var vehicleId = Guid.NewGuid();
         var vehicle = new Vehicle();
         _vehicleRepositoryMock.Setup(x => x.GetVehicleById(vehicleId)).Returns(vehicle);

@@ -30,7 +30,7 @@ public class GetMyRents
     }
 
     [Fact]
-    public void GetMyArchivedRents_UserNotLogged_ReturnsNull()
+    public void GetMyRents_UserNotLogged_ReturnsNull()
     {
         // Arrange
         _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
@@ -46,7 +46,7 @@ public class GetMyRents
     [InlineData(Roles.Unverified)]
     [InlineData(Roles.Employee)]
     [InlineData(Roles.Manager)]
-    public void GetMyArchivedRents_UserNotClient_ReturnsNull(string userRoleName)
+    public void GetMyRents_UserNotClient_ReturnsNull(string userRoleName)
     {
         // Arrange
         var userRole = new Role { Name = userRoleName };
@@ -62,7 +62,7 @@ public class GetMyRents
     }
 
     [Fact]
-    public void GetMyArchivedRents_CorrectRequest_ReturnsResult()
+    public void GetMyRents_CorrectRequest_ReturnsResult()
     {
         // Arrange
         var userId = Guid.NewGuid();
