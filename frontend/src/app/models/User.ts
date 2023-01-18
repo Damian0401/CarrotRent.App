@@ -27,3 +27,12 @@ export interface User {
     role: string;
     departmentIds: string[];
 }
+
+export interface UserDetails {
+    id: string;
+    firstName: string;
+    lastName: string;
+    pesel: string;
+    phoneNumber: string;
+    email: string;
+}

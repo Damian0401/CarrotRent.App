@@ -12,17 +12,8 @@ export default function VehicleDashboard() {
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     
-    const handleSearch = ({maxPrice, minPrice, seats, 
-        brandId, departmentId, fuelId, modelId}: SelectedFilters) => {
-        let query = '';
-        if (maxPrice) query += `maxPrice=${maxPrice}&`;
-        if (minPrice) query += `minPrice=${minPrice}&`;
-        if (seats) query += `seats=${seats}&`;
-        if (brandId) query += `brandId=${brandId}&`;
-        if (departmentId) query += `departmentId=${departmentId}&`;
-        if (fuelId) query += `fuelId=${fuelId}&`;
-        if (modelId) query += `modelId=${modelId}&`;
-        agent.Vehicle.getAll(query).then(data => setVehicles(data));
+    const handleSearch = (filters: SelectedFilters) => {
+        agent.Vehicle.getAll(filters).then(data => setVehicles(data));
     }
 
     return (

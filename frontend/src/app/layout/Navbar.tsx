@@ -1,9 +1,10 @@
-import { ArrowBackIcon, ArrowForwardIcon, AtSignIcon, CalendarIcon, EditIcon, HamburgerIcon, Search2Icon, ViewIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ArrowForwardIcon, AtSignIcon, CalendarIcon, EditIcon, HamburgerIcon, LockIcon, QuestionOutlineIcon, RepeatClockIcon, Search2Icon, UnlockIcon, ViewIcon } from "@chakra-ui/icons";
 import { Center, Flex, HStack, Icon, IconButton, Menu, MenuButton, MenuItem, MenuList, Spacer, Text } from "@chakra-ui/react";
 import { useContext } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { UserContext } from "../common/providers/UserProvider";
 import { UserAction, UserActionType } from "../common/reducers/UserReducer";
+import { CLIENT, EMPLOYEE, MANAGER } from "../common/utils/constants";
 
 export default function Navbar() {
 
@@ -43,10 +44,9 @@ export default function Navbar() {
                 </HStack>
                 <Spacer />
                 <Center height='100%'>
-                    {user &&
-                        <Text variant='navbar-text' fontSize='large' fontFamily='monospace'>
-                            {user.login} <b>[{user.role}]</b>
-                        </Text>}
+                    {user && <Text variant='navbar-text' fontSize='large' fontFamily='monospace'>
+                        {user.login} <b>[{user.role}]</b>
+                    </Text>}
                     <Menu>
                         <MenuButton
                             as={IconButton}
@@ -65,9 +65,16 @@ export default function Navbar() {
                                 Vehicles
                             </MenuItem>
                             {user ? <>
-                                <MenuItem icon={<CalendarIcon />} as={Link} to='/rents'>
-                                    Rents
-                                </MenuItem>
+                                {user.role === CLIENT && <>
+                                    <MenuItem icon={<CalendarIcon />} as={Link} to='/rents'>
+                                        Rents
+                                    </MenuItem>
+                                </>}
+                                {(user.role === EMPLOYEE || user.role === MANAGER) && <>
+                                    <MenuItem icon={<LockIcon />} as={Link} to='/users/unverified'>
+                                        Unverified
+                                    </MenuItem>
+                                </>}
                                 <MenuItem icon={<ArrowBackIcon />} onClick={handleLogout}>
                                     Logout
                                 </MenuItem>

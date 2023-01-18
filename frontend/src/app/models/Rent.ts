@@ -13,8 +13,11 @@ export interface RentDetails {
     startDate?: Date;
     endDate?: Date;
     client: string;
+    clientId: string;
     renter?: string;
+    renterId?: string;
     receiver?: string;
+    receiverId?: string;
     vehicle: VehicleForRent;
     status: string;
 }

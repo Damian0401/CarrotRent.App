@@ -15,10 +15,11 @@ import RentDetails from "../../features/rent/details/RentDetails";
 import PrivateRoute from "../common/shared/PrivateRoute";
 import AnonymousRoute from "../common/shared/AnonymousRoute";
 import VehicleEdit from "../../features/vehicle/edit/VehicleEdit";
-import { EMPLOYEE, MANAGER } from "../common/utils/constants";
+import { CLIENT, EMPLOYEE, MANAGER } from "../common/utils/constants";
 import VehicleCreate from "../../features/vehicle/create/VehicleCreate";
 import { ToastContainer } from "react-toastify";
 import AccessDenied from "../../features/error/AccessDenied";
+import { Unverified } from "../../features/user/Unverified";
 
 function App() {
   return (
@@ -30,6 +31,10 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path='login' element={<AnonymousRoute Component={LoginForm} />} />
           <Route path='register' element={<AnonymousRoute Component={RegisterForm} />} />
+          <Route path='users/unverified' element={<PrivateRoute
+            roles={[EMPLOYEE, MANAGER]}
+            Component={Unverified}
+          />} />
           <Route path='map' element={<Map />} />
           <Route path='departments'>
             <Route index element={<DepartmentDashboard />} />
@@ -55,9 +60,12 @@ function App() {
           </Route>
           <Route path='rents'>
             <Route index element={<RentDashboard />} />
-            <Route path=':id' element={<RentDetails />} />
+            <Route path=':id' element={<PrivateRoute
+              roles={[CLIENT, EMPLOYEE, MANAGER]}
+              Component={RentDetails}
+            />} />
           </Route>
-          <Route path='access-denied' element={<AccessDenied />} />
+          <Route path='accessDenied' element={<AccessDenied />} />
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

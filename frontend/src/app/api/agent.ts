@@ -2,8 +2,8 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { BASE_API_URL } from "../common/utils/constants";
 import { Department as DepartmentDto, DepartmentDetails, DepartmentMarker } from "../models/Department";
-import { User, UserLoginValues, UserRegisterValues } from "../models/User";
-import { Vehicle as VehicleDto, VehicleCreateValues, VehicleDetails, VehicleEditValues, VehicleFilters } from "../models/Vehicle";
+import { User, UserDetails, UserLoginValues, UserRegisterValues } from "../models/User";
+import { SelectedFilters, Vehicle as VehicleDto, VehicleCreateValues, VehicleDetails, VehicleEditValues, VehicleFilters } from "../models/Vehicle";
 import { history } from "../..";
 
 axios.defaults.baseURL = BASE_API_URL;
@@ -25,10 +25,10 @@ axios.interceptors.response.use(response => response, (error: AxiosError) => {
     const { status } = error.response;
     switch (status) {
         case 403:
-            history.push('/access-denied');
+            history.push('/accessDenied');
             break;
         case 404:
-            history.push('/not-found');
+            history.push('/notFound');
             break;
     }
 
@@ -51,7 +51,17 @@ const Department = {
 };
 
 const Vehicle = {
-    getAll: (filters?: string) => requests.get<{ vehicles: VehicleDto[] }>(`/vehicle?${filters}`).then(x => x.vehicles),
+    getAll: ({maxPrice, minPrice, seats, brandId, departmentId, fuelId, modelId}: SelectedFilters) => {
+        let query = '';
+        if (maxPrice) query += `maxPrice=${maxPrice}&`;
+        if (minPrice) query += `minPrice=${minPrice}&`;
+        if (seats) query += `seats=${seats}&`;
+        if (brandId) query += `brandId=${brandId}&`;
+        if (departmentId) query += `departmentId=${departmentId}&`;
+        if (fuelId) query += `fuelId=${fuelId}&`;
+        if (modelId) query += `modelId=${modelId}&`;
+        return requests.get<{ vehicles: VehicleDto[] }>(`/vehicle?${query}`).then(x => x.vehicles)
+    },
     getById: (id: string) => requests.get<VehicleDetails>(`/vehicle/${id}`),
     getFilters: () => requests.get<VehicleFilters>('/vehicle/filters'),
     delete: (id: string) => requests.delete(`/vehicle/${id}`),
@@ -61,7 +71,9 @@ const Vehicle = {
 
 const Account = {
     login: (loginValues: UserLoginValues) => requests.post<User>('account/login', loginValues),
-    register: (registerValues: UserRegisterValues) => requests.post<User>('/account/register', registerValues)
+    register: (registerValues: UserRegisterValues) => requests.post<User>('/account/register', registerValues),
+    verify: (id: string) => requests.post(`/account/verify/${id}`,{}),
+    unverified: () => requests.get<{users: UserDetails[]}>('/account/unverified').then(x => x.users),
 }
 
 const agent = {

@@ -14,8 +14,11 @@ export default function RentDetails() {
         id: id || 'id',
         status: 'active',
         client: 'client',
+        clientId: 'clientId',
         renter: 'renter',
+        renterId: 'renterId',
         receiver: 'receiver',
+        receiverId: 'receiverId',
         startDate: new Date(),
         endDate: new Date(),
         vehicle: {
