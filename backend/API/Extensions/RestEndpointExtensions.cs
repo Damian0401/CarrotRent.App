@@ -129,6 +129,24 @@ public static class RestEndpointExtensions
             return Results.Ok(response);
         });
 
+        app.MapPost("/api/v1/account/verify/{id:guid}", 
+        [Authorize(Roles=Roles.Manager + "," + Roles.Employee)] 
+        (Guid id, IAccountService service) =>
+        {
+            var response = service.VerifyUser(id);
+
+            return response ? Results.NoContent() : Results.BadRequest();
+        });
+
+        app.MapGet("/api/v1/account/unverified", 
+        [Authorize(Roles=Roles.Manager + "," + Roles.Employee)] 
+        (IAccountService service) =>
+        {
+            var response = service.GetUnverifiedUsers();
+
+            return Results.Ok(response);
+        });
+
         return app;
     }
 }
