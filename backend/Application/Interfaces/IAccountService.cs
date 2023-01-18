@@ -6,6 +6,7 @@ namespace Application.Interfaces
     {
         LoginDtoResponse? Login(LoginDtoRequest dto);
         RegisterDtoResponse? Register(RegisterDtoRequest dto);
-        bool Verify(Guid userId);
+        bool VerifyUser(Guid userId);
+        GetUnverifiedUsersDtoResponse GetUnverifiedUsers();
     }
 }

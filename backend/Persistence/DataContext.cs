@@ -153,6 +153,9 @@ public class DataContext : DbContext
             .Property(x => x.LastName)
             .HasMaxLength(255);
         builder.Entity<UserData>()
+            .Property(x => x.Pesel)
+            .HasMaxLength(255);
+        builder.Entity<UserData>()
             .Property(x => x.PhoneNumber)
             .HasMaxLength(255);
         builder.Entity<UserData>()

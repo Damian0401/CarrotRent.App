@@ -10,14 +10,14 @@ using Xunit;
 
 namespace UnitTests.AccountServiceTests;
 
-public class Verify
+public class VerifyUser
 {
     private readonly Mock<IAccountRepository> _accountRepositoryMock;
     private readonly Mock<IUserAccessor> _userAccessorMock;
     private readonly Mock<IJwtGenerator> _JwtGeneratorMock;
     private readonly AccountService _accountService;
     
-    public Verify()
+    public VerifyUser()
     {
         var mapper = new MapperConfiguration(config => config.AddProfile(new AutoMapperProfile()))
             .CreateMapper();
@@ -39,7 +39,7 @@ public class Verify
         _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns<User?>(null);
 
         // Act
-        var result = _accountService.Verify(userId);
+        var result = _accountService.VerifyUser(userId);
 
         // Assert
         Assert.False(result);
@@ -57,7 +57,7 @@ public class Verify
         _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         // Act
-        var result = _accountService.Verify(userId);
+        var result = _accountService.VerifyUser(userId);
 
         // Assert
         Assert.False(result);
@@ -75,7 +75,7 @@ public class Verify
         _accountRepositoryMock.Setup(x => x.GetUserRoleName(userId)).Returns<string?>(null);
 
         // Act
-        var result = _accountService.Verify(userId);
+        var result = _accountService.VerifyUser(userId);
 
         // Assert
         Assert.False(result);
@@ -96,7 +96,7 @@ public class Verify
         _accountRepositoryMock.Setup(x => x.GetUserRoleName(userId)).Returns(userToVerifyRoleName);
 
         // Act
-        var result = _accountService.Verify(userId);
+        var result = _accountService.VerifyUser(userId);
 
         // Assert
         Assert.False(result);
@@ -115,7 +115,7 @@ public class Verify
         _accountRepositoryMock.Setup(x => x.GetRoleByName(Roles.Client)).Returns<Role?>(null);
 
         // Act
-        var result = _accountService.Verify(userId);
+        var result = _accountService.VerifyUser(userId);
 
         // Assert
         Assert.False(result);
@@ -138,7 +138,7 @@ public class Verify
         _accountRepositoryMock.Setup(x => x.UpdateUserRoleId(userId, clientRoleId)).Returns(false);
 
         // Act
-        var result = _accountService.Verify(userId);
+        var result = _accountService.VerifyUser(userId);
 
         // Assert
         Assert.False(result);
@@ -162,7 +162,7 @@ public class Verify
         _accountRepositoryMock.Setup(x => x.UpdateUserRoleId(userId, clientRoleId)).Returns(true);
 
         // Act
-        var result = _accountService.Verify(userId);
+        var result = _accountService.VerifyUser(userId);
 
         // Assert
         Assert.True(result);

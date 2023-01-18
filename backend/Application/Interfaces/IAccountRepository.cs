@@ -5,7 +5,7 @@ namespace Application.Interfaces
     public interface IAccountRepository
     {
         bool IsEmailAvailable(string email);
-        bool IsPeselAvailable(int pesel);
+        bool IsPeselAvailable(string pesel);
         bool IsPhoneNumberAvailable(string phoneNumber);
         bool IsLoginAvailable(string login);
         bool CreateUser(User user);
@@ -13,5 +13,6 @@ namespace Application.Interfaces
         string? GetUserRoleName(Guid userId);
         User? GetUserByLogin(string login);
         Role GetRoleByName(string roleName);
+        List<User> GetUnverifiedUsers();
     }
 }

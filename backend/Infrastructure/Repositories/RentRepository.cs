@@ -57,7 +57,17 @@ public class RentRepository : IRentRepository
 
     public Rent? GetRentById(Guid id)
     {
-        var rent = _context.Rents.Find(id);
+        var rent = _context.Rents
+            .Include(x => x.Client)
+            .ThenInclude(x => x.UserData)
+            .Include(x => x.Receiver)
+            .ThenInclude(x => x.UserData)
+            .Include(x => x.Renter)
+            .ThenInclude(x => x.UserData)
+            .Include(x => x.Vehicle)
+            .ThenInclude(x => x.Model)
+            .ThenInclude(x => x.Brand)
+            .FirstOrDefault(x => x.Id.Equals(id));
 
         return rent;
     }

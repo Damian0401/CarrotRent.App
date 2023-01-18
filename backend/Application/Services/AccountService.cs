@@ -22,6 +22,18 @@ public class AccountService : IAccountService
         _mapper = mapper;
         _accountRepository = accountRepository;
     }
+
+    public GetUnverifiedUsersDtoResponse GetUnverifiedUsers()
+    {
+        var users = _accountRepository.GetUnverifiedUsers();
+
+        var mappedUsers = _mapper.Map<List<UserForGetUnverifiedUsersDtoResponse>>(users);
+
+        var response = new GetUnverifiedUsersDtoResponse { Users = mappedUsers };
+
+        return response;
+    }
+
     public LoginDtoResponse? Login(LoginDtoRequest dto)
     {
         var user = _accountRepository.GetUserByLogin(dto.Login);
@@ -68,7 +80,7 @@ public class AccountService : IAccountService
         return response;
     }
 
-    public bool Verify(Guid userId)
+    public bool VerifyUser(Guid userId)
     {
         var user = _userAccessor.GetCurrentlyLoggedUser();
 

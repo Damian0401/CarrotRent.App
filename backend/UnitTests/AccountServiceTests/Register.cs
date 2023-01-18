@@ -73,7 +73,7 @@ public class Register
         // Arrange
         var email = "RequestEmail";
         var login = "RequestLogin";
-        var pesel = 1234567890;
+        var pesel = "1234567890";
         var request = new RegisterDtoRequest
         {
             Email = email,
@@ -98,7 +98,7 @@ public class Register
         // Arrange
         var email = "RequestEmail";
         var login = "RequestLogin";
-        var pesel = 1234567890;
+        var pesel = "1234567890";
         var phoneNumber = "1234567890";
         var request = new RegisterDtoRequest
         {
@@ -126,7 +126,7 @@ public class Register
         // Arrange
         var email = "RequestEmail";
         var login = "RequestLogin";
-        var pesel = 1234567890;
+        var pesel = "1234567890";
         var phoneNumber = "1234567890";
         var request = new RegisterDtoRequest
         {
@@ -156,7 +156,7 @@ public class Register
         // Arrange
         var email = "RequestEmail";
         var login = "RequestLogin";
-        var pesel = 1234567890;
+        var pesel = "1234567890";
         var phoneNumber = "1234567890";
         var request = new RegisterDtoRequest
         {
@@ -186,7 +186,7 @@ public class Register
         // Arrange
         var email = "RequestEmail";
         var login = "RequestLogin";
-        var pesel = 1234567890;
+        var pesel = "1234567890";
         var phoneNumber = "1234567890";
         var request = new RegisterDtoRequest
         {

@@ -44,6 +44,17 @@ public class AccountRepository : IAccountRepository
         return role;
     }
 
+    public List<User> GetUnverifiedUsers()
+    {
+        var users = _context.Users
+            .Include(x => x.UserData)
+            .Include(x => x.Role)
+            .Where(x => x.Role.Name.Equals(Roles.Unverified))
+            .ToList();
+
+        return users;
+    }
+
     public User? GetUserByLogin(string login)
     {
         return _context
@@ -55,7 +66,11 @@ public class AccountRepository : IAccountRepository
 
     public string? GetUserRoleName(Guid userId)
     {
-        throw new NotImplementedException();
+        var user = _context.Users
+            .Include(x => x.Role)
+            .FirstOrDefault(x => x.Id.Equals(userId));
+
+        return user?.Role.Name;
     }
 
     public bool IsEmailAvailable(string email)
@@ -72,7 +87,7 @@ public class AccountRepository : IAccountRepository
             .Any(x => x.Login.Equals(login));
     }
 
-    public bool IsPeselAvailable(int pesel)
+    public bool IsPeselAvailable(string pesel)
     {
         return !_context
             .UserData

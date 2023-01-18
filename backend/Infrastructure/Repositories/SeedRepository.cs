@@ -81,7 +81,7 @@ public class SeedRepository : ISeedRepository
             Email = "manager@gmail.com",
             FirstName = "John",
             LastName = "Smith",
-            Pesel = 987654321,
+            Pesel = "987654321",
             PhoneNumber = "+48123456789",
         };
 

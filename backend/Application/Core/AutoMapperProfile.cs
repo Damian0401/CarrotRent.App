@@ -68,6 +68,17 @@ public class AutoMapperProfile : Profile
                     ? u.OwnedDepartments.Select(x => x.Id) 
                     : u.OwnedDepartments.Select(x => x.Id)
                         .Append(u.DepartmentId.Value)));
+        CreateMap<User, UserForGetUnverifiedUsersDtoResponse>()
+            .ForMember(x => x.Email, s =>
+                s.MapFrom(x => x.UserData.Email))
+            .ForMember(x => x.FirstName, s =>
+                s.MapFrom(x => x.UserData.FirstName))
+            .ForMember(x => x.LastName, s =>
+                s.MapFrom(x => x.UserData.LastName))
+            .ForMember(x => x.Pesel, s =>
+                s.MapFrom(x => x.UserData.Pesel))
+            .ForMember(x => x.PhoneNumber, s =>
+                s.MapFrom(x => x.UserData.PhoneNumber));
     }
 
     private void MapsForDepartment()
@@ -98,7 +109,13 @@ public class AutoMapperProfile : Profile
         CreateMap<Rent, RentForGetDepartmentRentsDtoResponse>();
         CreateMap<Rent, RentForGetMyArchivedRentsDtoResponse>();
         CreateMap<Rent, RentForGetMyRentsDtoResponse>();
-        CreateMap<Rent, GetRentByIdDtoResponse>();
+        CreateMap<Rent, GetRentByIdDtoResponse>()
+            .ForMember(x => x.Renter, s =>
+                s.MapFrom(r => $"{r.Renter.UserData.FirstName} {r.Renter.UserData.LastName}"))
+            .ForMember(x => x.Receiver, s =>
+                s.MapFrom(r => $"{r.Receiver.UserData.FirstName} {r.Receiver.UserData.LastName}"))
+            .ForMember(x => x.Client, s =>
+                s.MapFrom(r => $"{r.Client.UserData.FirstName} {r.Client.UserData.LastName}"));
     }
 
     private void MapsForAddress()
