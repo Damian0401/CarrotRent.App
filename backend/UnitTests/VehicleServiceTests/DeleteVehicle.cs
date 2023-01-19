@@ -82,6 +82,26 @@ public class DeleteVehicle
     }
         
     [Fact]
+    public void DeleteVehicle_VehicleNotDeleted_ReturnsFalse()
+    {
+        // Arrange
+        var vehicleId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var user = new User { Id = userId };
+        var department = new Department { ManagerId = userId };
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _vehicleRepositoryMock.Setup(x => x.GetVehicleDepartment(vehicleId)).Returns(department);
+        _vehicleRepositoryMock.Setup(x => x.DeleteVehicle(vehicleId)).Returns(false);
+
+        // Act
+        var result = _vehicleService.DeleteVehicle(vehicleId);
+
+        // Assert
+        Assert.False(result);
+    }
+        
+    [Fact]
     public void DeleteVehicle_CorrectRequest_ReturnsTrue()
     {
         // Arrange
