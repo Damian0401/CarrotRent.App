@@ -105,10 +105,18 @@ public class AutoMapperProfile : Profile
     private void MapsForRent()
     {
         CreateMap<CreateRentDtoRequest, Rent>();
-        CreateMap<Rent, RentForGetDepartmentArchivedRentsDtoResponse>();
-        CreateMap<Rent, RentForGetDepartmentRentsDtoResponse>();
-        CreateMap<Rent, RentForGetMyArchivedRentsDtoResponse>();
-        CreateMap<Rent, RentForGetMyRentsDtoResponse>();
+        CreateMap<Rent, RentForGetDepartmentArchivedRentsDtoResponse>()
+            .ForMember(x => x.Vehicle, s => s.MapFrom(r => r.Vehicle.Model.Name))
+            .ForMember(x => x.Status, s => s.MapFrom(r => r.RentStatus.Name));
+        CreateMap<Rent, RentForGetDepartmentRentsDtoResponse>()
+            .ForMember(x => x.Vehicle, s => s.MapFrom(r => r.Vehicle.Model.Name))
+            .ForMember(x => x.Status, s => s.MapFrom(r => r.RentStatus.Name));
+        CreateMap<Rent, RentForGetMyArchivedRentsDtoResponse>()
+            .ForMember(x => x.Vehicle, s => s.MapFrom(r => r.Vehicle.Model.Name))
+            .ForMember(x => x.Status, s => s.MapFrom(r => r.RentStatus.Name));
+        CreateMap<Rent, RentForGetMyRentsDtoResponse>()
+            .ForMember(x => x.Vehicle, s => s.MapFrom(r => r.Vehicle.Model.Name))
+            .ForMember(x => x.Status, s => s.MapFrom(r => r.RentStatus.Name));
         CreateMap<Rent, GetRentByIdDtoResponse>()
             .ForMember(x => x.Renter, s =>
                 s.MapFrom(r => $"{r.Renter.UserData.FirstName} {r.Renter.UserData.LastName}"))

@@ -63,6 +63,11 @@ public class RentService : IRentService
         if (user is null || !user.Role.Name.Equals(Roles.Client))
             return false;
 
+        var rents = _rentRepository.GetRentBetweenDates(dto.StartDate, dto.EndDate);
+
+        if (rents.Count > 0)
+            return false;
+
         var rentStatusId = _rentRepository.GetRentStatusIdByName(RentStatuses.Reserved);
 
         if (rentStatusId is null)

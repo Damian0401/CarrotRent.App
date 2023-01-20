@@ -55,6 +55,17 @@ public class RentRepository : IRentRepository
         return rents;
     }
 
+    public List<Rent> GetRentBetweenDates(DateTime startDate, DateTime endDate)
+    {
+        var rents = _context.Rents
+            .Where(x => (x.StartDate > startDate && x.StartDate < endDate)
+                || (x.EndDate > startDate && x.EndDate < endDate)
+                || (x.StartDate < startDate && x.EndDate > endDate))
+            .ToList();
+
+        return rents;
+    }
+
     public Rent? GetRentById(Guid id)
     {
         var rent = _context.Rents
@@ -99,6 +110,9 @@ public class RentRepository : IRentRepository
             .Where(x => x.Id.Equals(userId))
             .Include(x => x.OwnRentings)
             .ThenInclude(x => x.RentStatus)
+            .Include(x => x.OwnRentings)
+            .ThenInclude(x => x.Vehicle)
+            .ThenInclude(x => x.Model)
             .SelectMany(x => x.OwnRentings)
             .Where(x => x.RentStatus.Name.Equals(RentStatuses.Archived))
             .ToList();
@@ -112,6 +126,9 @@ public class RentRepository : IRentRepository
             .Where(x => x.Id.Equals(userId))
             .Include(x => x.OwnRentings)
             .ThenInclude(x => x.RentStatus)
+            .Include(x => x.OwnRentings)
+            .ThenInclude(x => x.Vehicle)
+            .ThenInclude(x => x.Model)
             .SelectMany(x => x.OwnRentings)
             .Where(x => x.RentStatus.Name.Equals(RentStatuses.Active) 
                 || x.RentStatus.Name.Equals(RentStatuses.Reserved))

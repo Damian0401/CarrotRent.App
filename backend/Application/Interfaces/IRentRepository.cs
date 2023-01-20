@@ -15,4 +15,5 @@ public interface IRentRepository
     Guid? GetRentDepartmentId(Guid rentId);
     bool UpdateRent(Rent rent);
     double? GetVehiclePrice(Guid vehicleId);
+    List<Rent> GetRentBetweenDates(DateTime startDate, DateTime endDate);
 }

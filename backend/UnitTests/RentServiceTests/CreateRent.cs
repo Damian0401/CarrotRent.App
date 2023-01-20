@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Application.Constants;
 using Application.Core;
 using Application.Dtos.Rent;
@@ -65,6 +66,28 @@ public class CreateRent
     }
 
     [Fact]
+    public void CreateRent_RentsFoundBetween_ReturnsFalse()
+    {
+        // Arrange
+        var dto = new CreateRentDtoRequest();
+
+        var userRole = new Role { Name = Roles.Client };
+        var user = new User { Role = userRole };
+        var rents = new List<Rent> { new() };
+
+        _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
+        _rentRepositoryMock.Setup(x =>
+            x.GetRentBetweenDates(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Returns(rents);
+
+        // Act
+        var result = _rentService.CreateRent(dto);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
     public void CreateRent_ReservedRentStatusNotFound_ReturnsFalse()
     {
         // Arrange
@@ -72,9 +95,12 @@ public class CreateRent
 
         var userRole = new Role { Name = Roles.Client };
         var user = new User { Role = userRole };
+        var rents = new List<Rent>();
 
         _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
-
+        _rentRepositoryMock.Setup(x =>
+            x.GetRentBetweenDates(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Returns(rents);
         _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns<Guid?>(null);
 
         // Act
@@ -95,9 +121,13 @@ public class CreateRent
 
         _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
+        var rents = new List<Rent>();
         var reservedRentStatusId = Guid.NewGuid();
 
         _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(reservedRentStatusId);
+        _rentRepositoryMock.Setup(x =>
+            x.GetRentBetweenDates(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Returns(rents);
         _rentRepositoryMock.Setup(x => x.CreateRent(It.IsAny<Rent>())).Returns(false);
 
         // Act
@@ -119,8 +149,12 @@ public class CreateRent
         _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
 
         var reservedRentStatusId = Guid.NewGuid();
+        var rents = new List<Rent>();
 
         _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(reservedRentStatusId);
+        _rentRepositoryMock.Setup(x =>
+            x.GetRentBetweenDates(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Returns(rents);
         _rentRepositoryMock.Setup(x => x.CreateRent(It.IsAny<Rent>())).Returns(true);
 
         // Act

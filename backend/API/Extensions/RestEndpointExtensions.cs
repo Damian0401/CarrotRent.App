@@ -1,5 +1,6 @@
 using Application.Constants;
 using Application.Dtos.Account;
+using Application.Dtos.Rent;
 using Application.Dtos.Vehicle;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -135,7 +136,9 @@ public static class RestEndpointExtensions
         {
             var response = service.VerifyUser(id);
 
-            return response ? Results.NoContent() : Results.BadRequest();
+            return response 
+                ? Results.NoContent() 
+                : Results.BadRequest();
         });
 
         app.MapGet("/api/v1/account/unverified", 
@@ -145,6 +148,39 @@ public static class RestEndpointExtensions
             var response = service.GetUnverifiedUsers();
 
             return Results.Ok(response);
+        });
+
+        app.MapGet("/api/v1/rent/my",
+        [Authorize(Roles=Roles.Client)]
+        (IRentService service) => 
+        {
+            var response = service.GetMyRents();
+
+            return response is not null 
+                ? Results.Ok(response) 
+                : Results.BadRequest();
+        });
+
+        app.MapGet("/api/v1/rent/my/archived",
+        [Authorize(Roles=Roles.Client)]
+        (IRentService service) => 
+        {
+            var response = service.GetMyArchivedRents();
+
+            return response is not null 
+                ? Results.Ok(response) 
+                : Results.BadRequest();
+        });
+
+        app.MapPost("/api/v1/rent",
+        [Authorize(Roles=Roles.Client)]
+        (CreateRentDtoRequest dto, IRentService service) => 
+        {
+            var response = service.CreateRent(dto);
+
+            return response 
+                ? Results.NoContent() 
+                : Results.BadRequest();
         });
 
         return app;
