@@ -18,7 +18,13 @@ export default function RentListItem({ rent }: Props) {
                 boxSizing='border-box'
             >
                 <Text as='b'>
-                    {rent.vehicle + ' ' + format(rent.startDate, 'dd.MM.yyyy, HH:mm')}
+                    {rent.vehicle}
+                </Text>
+                <Text>
+                    {'start date: ' + format(rent.startDate, 'dd.MM.yyyy, HH:mm')}
+                </Text>
+                <Text>
+                    {'end date: ' + format(rent.endDate, 'dd.MM.yyyy, HH:mm')}
                 </Text>
                 <Text>
                     {'status: ' + rent.status}

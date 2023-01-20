@@ -7,6 +7,7 @@ import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import { UserProvider } from './app/common/providers/UserProvider';
 import 'react-toastify/dist/ReactToastify.min.css';
+import "react-datepicker/dist/react-datepicker.css";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

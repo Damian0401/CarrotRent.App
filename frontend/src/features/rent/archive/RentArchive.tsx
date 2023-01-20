@@ -10,22 +10,23 @@ import RentList from "../list/RentList";
 
 
 
-export default function RentDashboard() {
-
+export default function RentArchive() {
+    
     const { state: user } = useContext(UserContext);
     const [rents, setRents] = useState<Rent[]>([]);
-
+    
     useEffect(() => {
-        if (user?.role === CLIENT)
-            agent.Rent.getMy().then(rents => setRents(rents));
+            if (user?.role === CLIENT)
+                agent.Rent.getMyArchived().then(rents => setRents(rents));
     }, []);
+    
 
     return (
         <>
             <ContentCard>
                 <CardHeader>
                     <Heading size='lg' p='2'>
-                        All rents:
+                        Archived rents:
                     </Heading>
                 </CardHeader>
                 <CardBody>

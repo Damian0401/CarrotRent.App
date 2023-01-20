@@ -1,10 +1,11 @@
-import { Vehicle, VehicleForRent } from "./Vehicle";
+import { VehicleForRent } from "./Vehicle";
 
 
 export interface Rent {
     id: string;
     status: string;
     startDate: Date;
+    endDate: Date;
     vehicle: string;
 }
 
@@ -20,4 +21,10 @@ export interface RentDetails {
     receiverId?: string;
     vehicle: VehicleForRent;
     status: string;
+}
+
+export interface RentCreate {
+    vehicleId: string;
+    startDate: Date;
+    endDate: Date;
 }

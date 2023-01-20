@@ -19,7 +19,8 @@ import { CLIENT, EMPLOYEE, MANAGER } from "../common/utils/constants";
 import VehicleCreate from "../../features/vehicle/create/VehicleCreate";
 import { ToastContainer } from "react-toastify";
 import AccessDenied from "../../features/error/AccessDenied";
-import { Unverified } from "../../features/user/Unverified";
+import { UserUnverified } from "../../features/user/unverified/UserUnverified";
+import RentArchive from "../../features/rent/archive/RentArchive";
 
 function App() {
   return (
@@ -33,7 +34,7 @@ function App() {
           <Route path='register' element={<AnonymousRoute Component={RegisterForm} />} />
           <Route path='users/unverified' element={<PrivateRoute
             roles={[EMPLOYEE, MANAGER]}
-            Component={Unverified}
+            Component={UserUnverified}
           />} />
           <Route path='map' element={<Map />} />
           <Route path='departments'>
@@ -59,7 +60,12 @@ function App() {
             <Route path=':id' element={<VehicleDetails />} />
           </Route>
           <Route path='rents'>
-            <Route index element={<RentDashboard />} />
+            <Route index element={<PrivateRoute
+              Component={RentDashboard}
+            />} />
+            <Route path='archive' element={<PrivateRoute
+              Component={RentArchive}
+            />} />
             <Route path=':id' element={<PrivateRoute
               roles={[CLIENT, EMPLOYEE, MANAGER]}
               Component={RentDetails}

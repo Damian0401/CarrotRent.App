@@ -5,6 +5,7 @@ import { Department as DepartmentDto, DepartmentDetails, DepartmentMarker } from
 import { User, UserDetails, UserLoginValues, UserRegisterValues } from "../models/User";
 import { SelectedFilters, Vehicle as VehicleDto, VehicleCreateValues, VehicleDetails, VehicleEditValues, VehicleFilters } from "../models/Vehicle";
 import { history } from "../..";
+import { Rent as RentDto, RentCreate } from "../models/Rent";
 
 axios.defaults.baseURL = BASE_API_URL;
 
@@ -76,10 +77,25 @@ const Account = {
     unverified: () => requests.get<{users: UserDetails[]}>('/account/unverified').then(x => x.users),
 }
 
+const Rent = {
+    create: (rent: RentCreate) => requests.post('/rent', rent),
+    getMy: () => requests.get<{rents: RentDto[]}>('rent/my').then(x => {
+        x.rents.forEach(rent => rent.startDate = new Date(rent.startDate));
+        x.rents.forEach(rent => rent.endDate = new Date(rent.endDate));
+        return x.rents
+    }),
+    getMyArchived: () => requests.get<{rents: RentDto[]}>('rent/my/archived').then(x => {
+        x.rents.forEach(rent => rent.startDate = new Date(rent.startDate));
+        x.rents.forEach(rent => rent.endDate = new Date(rent.endDate));
+        return x.rents
+    }),
+}
+
 const agent = {
     Department,
     Vehicle,
     Account,
+    Rent
 };
 
 export default agent;

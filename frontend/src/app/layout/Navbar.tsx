@@ -65,11 +65,12 @@ export default function Navbar() {
                                 Vehicles
                             </MenuItem>
                             {user ? <>
-                                {user.role === CLIENT && <>
-                                    <MenuItem icon={<CalendarIcon />} as={Link} to='/rents'>
-                                        Rents
-                                    </MenuItem>
-                                </>}
+                                <MenuItem icon={<CalendarIcon />} as={Link} to='/rents'>
+                                    Rents
+                                </MenuItem>
+                                <MenuItem icon={<RepeatClockIcon />} as={Link} to='/rents/archive'>
+                                    Archive
+                                </MenuItem>
                                 {(user.role === EMPLOYEE || user.role === MANAGER) && <>
                                     <MenuItem icon={<LockIcon />} as={Link} to='/users/unverified'>
                                         Unverified
@@ -79,11 +80,11 @@ export default function Navbar() {
                                     Logout
                                 </MenuItem>
                             </> : <>
-                                <MenuItem icon={<ArrowForwardIcon />} as={Link} to='/login'>
-                                    Login
-                                </MenuItem>
                                 <MenuItem icon={<EditIcon />} as={Link} to='/register'>
                                     Register
+                                </MenuItem>
+                                <MenuItem icon={<ArrowForwardIcon />} as={Link} to='/login'>
+                                    Login
                                 </MenuItem>
                             </>}
                         </MenuList>

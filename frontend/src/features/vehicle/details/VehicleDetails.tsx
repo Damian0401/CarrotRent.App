@@ -1,20 +1,24 @@
-import { Button, ButtonGroup, Grid, GridItem, Heading, Text } from "@chakra-ui/react";
+import { CardBody, CardFooter, CardHeader } from "@chakra-ui/card";
+import { Button, ButtonGroup, Flex, Grid, GridItem, Heading, Text } from "@chakra-ui/react";
 import { CSSProperties, useContext, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import agent from "../../../app/api/agent";
 import { UserContext } from "../../../app/common/providers/UserProvider";
 import ContentCard from "../../../app/common/shared/ContentCard";
 import { userCanDeleteVehicle, userCanEditVehicle, userCanRentVehicle } from "../../../app/common/utils/helpers";
 import LoadingSpinner from "../../../app/layout/LoadingSpinner";
 import { VehicleDetails as Vehicle } from "../../../app/models/Vehicle";
+import RentCreate from "../../rent/create/RentCreate";
 
 
 export default function VehicleDetails() {
 
     const { id } = useParams<{ id: string }>();
-    const [vehicle, setVehicle] = useState<Vehicle>();
     const { state: user } = useContext(UserContext);
     const navigate = useNavigate();
+
+    const [vehicle, setVehicle] = useState<Vehicle>();
+    const [rentMode, setRentMode] = useState<boolean>(false);
 
     useEffect(() => {
         agent.Vehicle.getById(id!).then(data => setVehicle(data));
@@ -88,13 +92,19 @@ export default function VehicleDetails() {
                             >
                                 Edit
                             </Button>}
-                            {userCanRentVehicle(user) && <Button colorScheme='teal'>
-                                Rent
-                            </Button>}
+                            {userCanRentVehicle(user) && <>
+                                <Button
+                                    colorScheme='teal'
+                                    onClick={() => setRentMode(!rentMode)}
+                                >
+                                    Rent
+                                </Button>
+                            </>}
                         </ButtonGroup>}
                     </GridItem>
                 </Grid>
             </ContentCard>
+            {rentMode && <RentCreate vehicleId={vehicle.id} />}
         </>
     )
 }

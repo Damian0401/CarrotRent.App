@@ -2,40 +2,15 @@ import { CardBody, CardHeader } from "@chakra-ui/card";
 import { Heading } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import agent from "../../app/api/agent";
-import ContentCard from "../../app/common/shared/ContentCard";
-import { UserDetails } from "../../app/models/User";
-import UserList from "./list/UserList";
+import agent from "../../../app/api/agent";
+import ContentCard from "../../../app/common/shared/ContentCard";
+import { UserDetails } from "../../../app/models/User";
+import UserList from "../list/UserList";
 
 
-export function Unverified() {
+export function UserUnverified() {
 
-    const [users, setUsers] = useState<UserDetails[]>([
-        {
-            id: '1',
-            email: 'email',
-            firstName: "firstName",
-            lastName: "lastName",
-            pesel: "pesel",
-            phoneNumber: "phoneNumber",
-        },
-        {
-            id: '2',
-            email: 'email',
-            firstName: "firstName",
-            lastName: "lastName",
-            pesel: "pesel",
-            phoneNumber: "phoneNumber",
-        },
-        {
-            id: '3',
-            email: 'email',
-            firstName: "firstName",
-            lastName: "lastName",
-            pesel: "pesel",
-            phoneNumber: "phoneNumber",
-        },
-    ]);
+    const [users, setUsers] = useState<UserDetails[]>([]);
 
     useEffect(() => {
         agent.Account.unverified().then(x => setUsers(x))
