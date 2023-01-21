@@ -1,33 +1,44 @@
 import { CardBody, CardHeader } from "@chakra-ui/card";
-import { Box, Button, Heading, Stack, StackDivider, Text } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Heading, Stack, StackDivider, Text } from "@chakra-ui/react";
 import { format } from "date-fns";
-import { Link, useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import agent from "../../../app/api/agent";
+import { UserContext } from "../../../app/common/providers/UserProvider";
 import ContentCard from "../../../app/common/shared/ContentCard";
+import { userCanCancelRent, userCanIssueRent, userCanReceiveRent } from "../../../app/common/utils/helpers";
+import LoadingSpinner from "../../../app/layout/LoadingSpinner";
 import { RentDetails as Rent } from "../../../app/models/Rent"
 
 
 export default function RentDetails() {
 
-    const { id } = useParams<{ id: string }>();
+    const { rentId } = useParams<{ rentId: string }>();
+    const { state: user } = useContext(UserContext);
+    const [rent, setRent] = useState<Rent>();
+    const navigate = useNavigate();
 
-    const rent: Rent = {
-        id: id || 'id',
-        status: 'active',
-        client: 'client',
-        clientId: 'clientId',
-        renter: 'renter',
-        renterId: 'renterId',
-        receiver: 'receiver',
-        receiverId: 'receiverId',
-        startDate: new Date(),
-        endDate: new Date(),
-        vehicle: {
-            id: '1',
-            model: 'model',
-            brand: 'brand',
-            yearOfProduction: 2000
-        }
+    useEffect(() => {
+        if (rentId)
+            agent.Rent.getById(rentId).then(data => setRent(data));
+    }, [rentId]);
+
+    const handleCancel = () => {
+        if (rent)
+            agent.Rent.cancel(rent.id).then(() => navigate(-1));
     }
+
+    const handleIssue = () => {
+        if (rent)
+            agent.Rent.issue(rent.id).then(() => navigate(-1));
+    }
+
+    const handleReceive = () => {
+        if (rent)
+            agent.Rent.receive(rent.id).then(() => navigate(-1));
+    }
+
+    if (!rent) return <LoadingSpinner />
 
     return (
         <>
@@ -46,12 +57,12 @@ export default function RentDetails() {
                         <Text>
                             <b>Client:</b> {rent.client}
                         </Text>
-                        <Text>
+                        {rent.renter && <Text>
                             <b>Renter:</b> {rent.renter}
-                        </Text>
-                        <Text>
+                        </Text>}
+                        {rent.receiver && <Text>
                             <b>Receiver:</b> {rent.receiver}
-                        </Text>
+                        </Text>}
                         <Text>
                             <b>Start date:</b> {rent.startDate && format(rent.startDate, 'dd.MM.yyyy, HH:mm')}
                         </Text>
@@ -77,9 +88,17 @@ export default function RentDetails() {
                             </Text>
                         </Box>
                     </Stack>
-                        <Button position='absolute' bottom='0' right='0' colorScheme='teal'>
-                            Do something
-                        </Button>
+                    <ButtonGroup position='absolute' bottom='0' right='0' colorScheme='teal'>
+                        {userCanCancelRent(user, rent) && <Button onClick={handleCancel}>
+                            Cancel
+                        </Button>}
+                        {userCanIssueRent(user, rent) && <Button onClick={handleIssue}>
+                            Issue
+                        </Button>}
+                        {userCanReceiveRent(user, rent) && <Button onClick={handleReceive}>
+                            Receive
+                        </Button>}
+                    </ButtonGroup>
                 </CardBody>
             </ContentCard>
         </>

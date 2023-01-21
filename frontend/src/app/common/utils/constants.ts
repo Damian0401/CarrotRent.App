@@ -9,3 +9,9 @@ export const EMPLOYEE = 'Employee'
 export const CLIENT = 'Client'
 
 export const UNVERIFIED = 'Unverified';
+
+export const RESERVED = 'Reserved';
+
+export const ACTIVE = 'Active';
+
+export const ARCHIVED = 'Archived';

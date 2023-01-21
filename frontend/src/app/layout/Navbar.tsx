@@ -1,4 +1,4 @@
-import { ArrowBackIcon, ArrowForwardIcon, AtSignIcon, CalendarIcon, EditIcon, HamburgerIcon, LockIcon, QuestionOutlineIcon, RepeatClockIcon, Search2Icon, UnlockIcon, ViewIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ArrowForwardIcon, AtSignIcon, CalendarIcon, EditIcon, HamburgerIcon, LockIcon, RepeatClockIcon, Search2Icon, ViewIcon } from "@chakra-ui/icons";
 import { Center, Flex, HStack, Icon, IconButton, Menu, MenuButton, MenuItem, MenuList, Spacer, Text } from "@chakra-ui/react";
 import { useContext } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
@@ -65,12 +65,14 @@ export default function Navbar() {
                                 Vehicles
                             </MenuItem>
                             {user ? <>
-                                <MenuItem icon={<CalendarIcon />} as={Link} to='/rents'>
-                                    Rents
-                                </MenuItem>
-                                <MenuItem icon={<RepeatClockIcon />} as={Link} to='/rents/archive'>
-                                    Archive
-                                </MenuItem>
+                                {user.role === CLIENT && <>
+                                    <MenuItem icon={<CalendarIcon />} as={Link} to='/rents'>
+                                        Rents
+                                    </MenuItem>
+                                    <MenuItem icon={<RepeatClockIcon />} as={Link} to='/rents/archive'>
+                                        Archive
+                                    </MenuItem>
+                                </>}
                                 {(user.role === EMPLOYEE || user.role === MANAGER) && <>
                                     <MenuItem icon={<LockIcon />} as={Link} to='/users/unverified'>
                                         Unverified

@@ -11,14 +11,11 @@ export interface Rent {
 
 export interface RentDetails {
     id: string;
-    startDate?: Date;
-    endDate?: Date;
+    startDate: Date;
+    endDate: Date;
     client: string;
-    clientId: string;
     renter?: string;
-    renterId?: string;
     receiver?: string;
-    receiverId?: string;
     vehicle: VehicleForRent;
     status: string;
 }
@@ -27,4 +24,9 @@ export interface RentCreate {
     vehicleId: string;
     startDate: Date;
     endDate: Date;
+}
+
+export interface RentCost {
+    regularPrice: number;
+    penaltyPrice?: number;
 }

@@ -7,20 +7,21 @@ import ContentCard from "../../../app/common/shared/ContentCard";
 import { useContext, useEffect, useState } from "react";
 import LoadingSpinner from "../../../app/layout/LoadingSpinner";
 import agent from "../../../app/api/agent";
-import { AddIcon, CalendarIcon, EditIcon } from "@chakra-ui/icons";
+import { AddIcon, CalendarIcon, EditIcon, RepeatClockIcon } from "@chakra-ui/icons";
 import { userCanCreateVehicle, userCanManageEmployees, userCanManageRents } from "../../../app/common/utils/helpers";
 import { UserContext } from "../../../app/common/providers/UserProvider";
 import { Link } from "react-router-dom";
 
 export default function DepartmentDetails() {
 
-    const { id } = useParams<{ id: string }>();
+    const { departmentId } = useParams<{ departmentId: string }>();
     const [department, setDepartment] = useState<Department>();
     const { state: user } = useContext(UserContext);
 
     useEffect(() => {
-        agent.Department.getById(id!).then(data => setDepartment(data));
-    }, [id]);
+        if (departmentId)
+            agent.Department.getById(departmentId).then(data => setDepartment(data));
+    }, [departmentId]);
 
     if (!department) return <LoadingSpinner />;
 
@@ -53,9 +54,24 @@ export default function DepartmentDetails() {
                                 {userCanManageEmployees(user, department?.id) && <Tooltip label='Add an employee' >
                                     <IconButton aria-label="manage-button" icon={<EditIcon />} />
                                 </Tooltip>}
-                                {userCanManageRents(user, department) && <Tooltip label='Manage rents' >
-                                    <IconButton aria-label="rents-button" icon={<CalendarIcon />} />
-                                </Tooltip>}
+                                {userCanManageRents(user, department?.id) && <>
+                                    <Tooltip label='Manage rents' >
+                                        <IconButton
+                                            aria-label="rents-button"
+                                            icon={<CalendarIcon />}
+                                            as={Link}
+                                            to={`/departments/${departmentId}/rents`}
+                                        />
+                                    </Tooltip>
+                                    <Tooltip label='Archived rents' >
+                                        <IconButton
+                                            aria-label="rents-archive-button"
+                                            icon={<RepeatClockIcon />}
+                                            as={Link}
+                                            to={`/departments/${departmentId}/rents/archive`}
+                                        />
+                                    </Tooltip>
+                                </>}
                             </ButtonGroup>
                         </Flex>
                         <VehicleList vehicles={department.vehicles} />

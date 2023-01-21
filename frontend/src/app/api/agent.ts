@@ -5,7 +5,7 @@ import { Department as DepartmentDto, DepartmentDetails, DepartmentMarker } from
 import { User, UserDetails, UserLoginValues, UserRegisterValues } from "../models/User";
 import { SelectedFilters, Vehicle as VehicleDto, VehicleCreateValues, VehicleDetails, VehicleEditValues, VehicleFilters } from "../models/Vehicle";
 import { history } from "../..";
-import { Rent as RentDto, RentCreate } from "../models/Rent";
+import { Rent as RentDto, RentCost, RentCreate, RentDetails } from "../models/Rent";
 
 axios.defaults.baseURL = BASE_API_URL;
 
@@ -49,6 +49,16 @@ const Department = {
     getAll: () => requests.get<{ departments: DepartmentDto[] }>('/department').then(x => x.departments),
     getMarkers: () => requests.get<{ departments: DepartmentMarker[] }>('/department').then(x => x.departments),
     getById: (id: string) => requests.get<DepartmentDetails>(`/department/${id}`),
+    getRents: (id: string) => requests.get<{rents: RentDto[]}>(`/department/${id}/rents`).then(x => {
+        x.rents.forEach(rent => rent.startDate = new Date(rent.startDate));
+        x.rents.forEach(rent => rent.endDate = new Date(rent.endDate));
+        return x.rents
+    }),
+    getArchivedRents: (id: string) => requests.get<{rents: RentDto[]}>(`/department/${id}/rents/archived`).then(x => {
+        x.rents.forEach(rent => rent.startDate = new Date(rent.startDate));
+        x.rents.forEach(rent => rent.endDate = new Date(rent.endDate));
+        return x.rents
+    }),
 };
 
 const Vehicle = {
@@ -78,6 +88,14 @@ const Account = {
 }
 
 const Rent = {
+    getById: (id: string) => requests.get<RentDetails>(`/rent/${id}`).then(rent => {
+        rent.startDate = new Date(rent.startDate);
+        rent.endDate = new Date(rent.endDate);
+        return rent;
+    }),
+    cancel: (id: string) => requests.post(`/rent/${id}/cancel`, {}),
+    issue: (id: string) => requests.post(`/rent/${id}/issue`, {}),
+    receive: (id: string) => requests.post<RentCost>(`/rent/${id}/receive`, {}),
     create: (rent: RentCreate) => requests.post('/rent', rent),
     getMy: () => requests.get<{rents: RentDto[]}>('rent/my').then(x => {
         x.rents.forEach(rent => rent.startDate = new Date(rent.startDate));

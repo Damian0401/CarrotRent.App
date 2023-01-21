@@ -39,19 +39,32 @@ function App() {
           <Route path='map' element={<Map />} />
           <Route path='departments'>
             <Route index element={<DepartmentDashboard />} />
-            <Route path=':id' element={<DepartmentDetails />} />
+            <Route path=':departmentId'>
+              <Route index element={<DepartmentDetails />} />
+              <Route path='rents'>
+                <Route index
+                  element={<PrivateRoute
+                    Component={RentDashboard}
+                  />}
+                />
+                <Route path='archive'
+                  element={<PrivateRoute
+                    roles={[MANAGER, EMPLOYEE]}
+                    Component={RentArchive}
+                  />}
+                />
+              </Route>
+            </Route>
           </Route>
           <Route path='vehicles'>
             <Route index element={<VehicleDashboard />} />
-            <Route
-              path='create/:departmentId'
+            <Route path='create/:departmentId'
               element={<PrivateRoute
                 roles={[MANAGER]}
                 Component={VehicleCreate}
               />}
             />
-            <Route
-              path='edit/:id'
+            <Route path='edit/:id'
               element={<PrivateRoute
                 roles={[MANAGER, EMPLOYEE]}
                 Component={VehicleEdit}
@@ -60,16 +73,24 @@ function App() {
             <Route path=':id' element={<VehicleDetails />} />
           </Route>
           <Route path='rents'>
-            <Route index element={<PrivateRoute
-              Component={RentDashboard}
-            />} />
-            <Route path='archive' element={<PrivateRoute
-              Component={RentArchive}
-            />} />
-            <Route path=':id' element={<PrivateRoute
-              roles={[CLIENT, EMPLOYEE, MANAGER]}
-              Component={RentDetails}
-            />} />
+            <Route index
+              element={<PrivateRoute
+                roles={[CLIENT]}
+                Component={RentDashboard}
+              />}
+            />
+            <Route path='archive'
+              element={<PrivateRoute
+                roles={[CLIENT]}
+                Component={RentArchive}
+              />}
+            />
+            <Route path=':rentId'
+              element={<PrivateRoute
+                roles={[CLIENT, EMPLOYEE, MANAGER]}
+                Component={RentDetails}
+              />}
+            />
           </Route>
           <Route path='accessDenied' element={<AccessDenied />} />
           <Route path='*' element={<NotFound />} />
