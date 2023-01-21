@@ -63,7 +63,7 @@ public class RentService : IRentService
         if (user is null || !user.Role.Name.Equals(Roles.Client))
             return false;
 
-        var rents = _rentRepository.GetRentBetweenDates(dto.StartDate, dto.EndDate);
+        var rents = _rentRepository.GetRentBetweenDates(dto.VehicleId, dto.StartDate, dto.EndDate);
 
         if (rents.Count > 0)
             return false;
@@ -191,7 +191,7 @@ public class RentService : IRentService
         var user = _userAccessor.GetCurrentlyLoggedUser();
         var rent = _rentRepository.GetRentById(rentId);
 
-        var userCanManageRent = UserCanManageRent(user, rent);
+        var userCanManageRent = UserCanManageRent(user, rent, RentStatuses.Reserved);
 
         if (!userCanManageRent)
             return false;
@@ -209,46 +209,31 @@ public class RentService : IRentService
         return isUpdated;
     }
 
-    public ReceiveRentDtoResponse? ReceiveRent(Guid rentId)
+    public bool ReceiveRent(Guid rentId)
     {
         var user = _userAccessor.GetCurrentlyLoggedUser();
         var rent = _rentRepository.GetRentById(rentId);
 
-        var userCanManageRent = UserCanManageRent(user, rent);
+        var userCanManageRent = UserCanManageRent(user, rent, RentStatuses.Active);
 
         if (!userCanManageRent)
-            return null;
+            return false;
 
         var archivedStatusId = _rentRepository.GetRentStatusIdByName(RentStatuses.Archived);
 
-        var reservedDays = (rent!.EndDate - rent.StartDate).Days;
-        var exceededDays = (DateTime.Now - rent.EndDate).Days;
-
         if (archivedStatusId is null)
-            return null;
+            return false;
 
-        rent.RentStatusId = archivedStatusId.Value;
+        rent!.RentStatusId = archivedStatusId.Value;
         rent.EndDate = DateTime.Now;
         rent.ReceiverId = user!.Id;
-
-        var pricePerDay = _rentRepository.GetVehiclePrice(rent.VehicleId);
-
-        if (pricePerDay is null)
-            return null;
 
         var isUpdated = _rentRepository.UpdateRent(rent);
 
         if (!isUpdated)
-            return null;
+            return false;
 
-        var price = pricePerDay.Value * (reservedDays + 2 * exceededDays);
-
-        var response = new ReceiveRentDtoResponse
-        {
-            TotalPrice = price,
-        };
-
-        return response;
+        return true;
     }
 
     private bool IsUserManagerOrEmployee(Guid departmentId, User? user)
@@ -295,13 +280,13 @@ public class RentService : IRentService
         return isUserClient;
     }
 
-    private bool UserCanManageRent(User? user, Rent? rent)
+    private bool UserCanManageRent(User? user, Rent? rent, string status)
     {
         if (rent is null)
             return false;
 
         var reservedStatusId = _rentRepository
-            .GetRentStatusIdByName(RentStatuses.Reserved);
+            .GetRentStatusIdByName(status);
 
         if (!rent.RentStatusId.Equals(reservedStatusId))
             return false;

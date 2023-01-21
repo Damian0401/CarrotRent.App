@@ -30,6 +30,10 @@ public class SeedRepository : ISeedRepository
             .Roles
             .FirstOrDefault(x => x.Name.Equals(Roles.Manager));
 
+        var employeeRole = _context
+            .Roles
+            .FirstOrDefault(x => x.Name.Equals(Roles.Employee));
+
         var fuels = _context
             .Fuels
             .ToList();
@@ -59,7 +63,7 @@ public class SeedRepository : ISeedRepository
 
         var imageUrl = @"https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.pngitem.com%2Fpimgs%2Fm%2F135-1359965_transparent-carrots-png-vegetable-carrot-png-download.png&f=1&nofb=1&ipt=d95e94cc1dc182d7d2f2c327ace0bf6d0fed497ed581fd97a994774904245647&ipo=images";
 
-        if (managerRole is null)
+        if (managerRole is null || employeeRole is null)
             throw new InvalidDataException();
 
         var hasher = new PasswordHasher<User>();
@@ -78,7 +82,7 @@ public class SeedRepository : ISeedRepository
         var managerUserData = new UserData
         {
             Address = managerAddress,
-            Email = "manager@gmail.com",
+            Email = "manager@carrot.com",
             FirstName = "John",
             LastName = "Smith",
             Pesel = "987654321",
@@ -106,6 +110,47 @@ public class SeedRepository : ISeedRepository
             UserData = managerUserData,
         };
         thirdManager.PasswordHash = hasher.HashPassword(firstManager, "admin123");
+
+        var employeeAddress = new Address
+        {
+            ApartmentNumber = "789",
+            City = "Wroclaw",
+            HouseNumber = "098",
+            PostCode = "55-777",
+            Street = "Woodland",
+        };
+
+        var employeeUserData = new UserData
+        {
+            Address = managerAddress,
+            Email = "employee@carrot.com",
+            FirstName = "Wilt",
+            LastName = "Chamberlain",
+            Pesel = "123456789",
+            PhoneNumber = "+48987654321",
+        };
+
+        var firstEmployee = new User
+        {
+            Login = "firstUser",
+            Role = employeeRole,
+            UserData = employeeUserData,
+        };
+        firstEmployee.PasswordHash = hasher.HashPassword(firstManager, "admin123");
+        var secondEmployee = new User
+        {
+            Login = "secondUser",
+            Role = employeeRole,
+            UserData = employeeUserData,
+        };
+        secondEmployee.PasswordHash = hasher.HashPassword(firstManager, "admin123");
+        var thirdEmployee = new User
+        {
+            Login = "thirdUser",
+            Role = employeeRole,
+            UserData = employeeUserData,
+        };
+        thirdEmployee.PasswordHash = hasher.HashPassword(firstManager, "admin123");
         var departments = new List<Department>
         {
             new Department
@@ -125,6 +170,10 @@ public class SeedRepository : ISeedRepository
                     YPosition = 17.0385376
                 },
                 Manager = firstManager,
+                Employees = new List<User>
+                {
+                    firstEmployee
+                },
                 Vehicles = new List<Vehicle>
                 {
                     new Vehicle
@@ -185,6 +234,10 @@ public class SeedRepository : ISeedRepository
                     YPosition = 17.0525376
                 },
                 Manager = secondManager,
+                Employees = new List<User>
+                {
+                    secondEmployee
+                },
                 Vehicles = new List<Vehicle>
                 {
                     new Vehicle
@@ -245,6 +298,10 @@ public class SeedRepository : ISeedRepository
                     YPosition = 17.0275376
                 },
                 Manager = thirdManager,
+                Employees = new List<User>
+                {
+                    thirdEmployee
+                },
                 Vehicles = new List<Vehicle>
                 {
                     new Vehicle

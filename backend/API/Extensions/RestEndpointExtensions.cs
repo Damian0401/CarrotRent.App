@@ -108,6 +108,28 @@ public static class RestEndpointExtensions
             return Results.Ok(response);
         });
 
+        app.MapGet("/api/v1/department/{id:guid}/rents",
+        [Authorize(Roles=Roles.Manager + "," + Roles.Employee)]
+        (Guid id, IRentService service) => 
+        {
+            var response = service.GetDepartmentRents(id);
+
+            return response is not null 
+                ? Results.Ok(response) 
+                : Results.BadRequest();
+        });
+
+        app.MapGet("/api/v1/department/{id:guid}/rents/archived",
+        [Authorize(Roles=Roles.Manager + "," + Roles.Employee)]
+        (Guid id, IRentService service) => 
+        {
+            var response = service.GetDepartmentArchivedRents(id);
+
+            return response is not null 
+                ? Results.Ok(response) 
+                : Results.BadRequest();
+        });
+
         app.MapPost("/api/v1/account/login", 
         (LoginDtoRequest dto, IAccountService service) =>
         {
@@ -150,6 +172,50 @@ public static class RestEndpointExtensions
             return Results.Ok(response);
         });
 
+        app.MapGet("/api/v1/rent/{id:guid}",
+        [Authorize(Roles=Roles.Manager + "," + Roles.Employee + "," + Roles.Client)]
+        (Guid id, IRentService service) => 
+        {
+            var response = service.GetRentById(id);
+
+            return response is not null 
+                ? Results.Ok(response) 
+                : Results.NotFound();
+        });
+
+        app.MapPost("/api/v1/rent/{id:guid}/cancel",
+        [Authorize(Roles=Roles.Client)]
+        (Guid id, IRentService service) => 
+        {
+            var response = service.CancelRent(id);
+
+            return response 
+                ? Results.Ok() 
+                : Results.BadRequest();
+        });
+
+        app.MapPost("/api/v1/rent/{id:guid}/issue",
+        [Authorize(Roles=Roles.Manager + "," + Roles.Employee)]
+        (Guid id, IRentService service) => 
+        {
+            var response = service.IssueRent(id);
+
+            return response 
+                ? Results.Ok() 
+                : Results.BadRequest();
+        });
+
+        app.MapPost("/api/v1/rent/{id:guid}/receive",
+        [Authorize(Roles=Roles.Manager + "," + Roles.Employee)]
+        (Guid id, IRentService service) => 
+        {
+            var response = service.ReceiveRent(id);
+
+            return response
+                ? Results.Ok(response) 
+                : Results.BadRequest();
+        });
+
         app.MapGet("/api/v1/rent/my",
         [Authorize(Roles=Roles.Client)]
         (IRentService service) => 
@@ -171,6 +237,7 @@ public static class RestEndpointExtensions
                 ? Results.Ok(response) 
                 : Results.BadRequest();
         });
+
 
         app.MapPost("/api/v1/rent",
         [Authorize(Roles=Roles.Client)]

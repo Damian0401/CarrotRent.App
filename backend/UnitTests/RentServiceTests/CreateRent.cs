@@ -69,7 +69,8 @@ public class CreateRent
     public void CreateRent_RentsFoundBetween_ReturnsFalse()
     {
         // Arrange
-        var dto = new CreateRentDtoRequest();
+        var vehicleId = Guid.NewGuid();
+        var dto = new CreateRentDtoRequest { VehicleId = vehicleId };
 
         var userRole = new Role { Name = Roles.Client };
         var user = new User { Role = userRole };
@@ -77,7 +78,7 @@ public class CreateRent
 
         _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
         _rentRepositoryMock.Setup(x =>
-            x.GetRentBetweenDates(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            x.GetRentBetweenDates(vehicleId, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .Returns(rents);
 
         // Act
@@ -91,7 +92,9 @@ public class CreateRent
     public void CreateRent_ReservedRentStatusNotFound_ReturnsFalse()
     {
         // Arrange
-        var dto = new CreateRentDtoRequest();
+        var vehicleId = Guid.NewGuid();
+        var dto = new CreateRentDtoRequest { VehicleId = vehicleId };
+
 
         var userRole = new Role { Name = Roles.Client };
         var user = new User { Role = userRole };
@@ -99,7 +102,7 @@ public class CreateRent
 
         _userAccessorMock.Setup(x => x.GetCurrentlyLoggedUser()).Returns(user);
         _rentRepositoryMock.Setup(x =>
-            x.GetRentBetweenDates(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            x.GetRentBetweenDates(vehicleId, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .Returns(rents);
         _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns<Guid?>(null);
 
@@ -114,7 +117,8 @@ public class CreateRent
     public void CreateRent_RentNotCreated_ReturnFalse()
     {
         // Arrange
-        var dto = new CreateRentDtoRequest();
+        var vehicleId = Guid.NewGuid();
+        var dto = new CreateRentDtoRequest { VehicleId = vehicleId };
 
         var userRole = new Role { Name = Roles.Client };
         var user = new User { Role = userRole };
@@ -126,7 +130,7 @@ public class CreateRent
 
         _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(reservedRentStatusId);
         _rentRepositoryMock.Setup(x =>
-            x.GetRentBetweenDates(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            x.GetRentBetweenDates(vehicleId, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .Returns(rents);
         _rentRepositoryMock.Setup(x => x.CreateRent(It.IsAny<Rent>())).Returns(false);
 
@@ -141,7 +145,8 @@ public class CreateRent
     public void CreateRent_CorrectRequest_ReturnsTrue()
     {
         // Arrange
-        var dto = new CreateRentDtoRequest();
+        var vehicleId = Guid.NewGuid();
+        var dto = new CreateRentDtoRequest { VehicleId = vehicleId };
 
         var userRole = new Role { Name = Roles.Client };
         var user = new User { Role = userRole };
@@ -153,7 +158,7 @@ public class CreateRent
 
         _rentRepositoryMock.Setup(x => x.GetRentStatusIdByName(RentStatuses.Reserved)).Returns(reservedRentStatusId);
         _rentRepositoryMock.Setup(x =>
-            x.GetRentBetweenDates(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            x.GetRentBetweenDates(vehicleId, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .Returns(rents);
         _rentRepositoryMock.Setup(x => x.CreateRent(It.IsAny<Rent>())).Returns(true);
 

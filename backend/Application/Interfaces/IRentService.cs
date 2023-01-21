@@ -6,7 +6,7 @@ namespace Application.Interfaces
     {
         bool CreateRent(CreateRentDtoRequest dto);
         bool IssueRent(Guid rentId);
-        ReceiveRentDtoResponse? ReceiveRent(Guid rentId);
+        bool ReceiveRent(Guid rentId);
         GetRentByIdDtoResponse? GetRentById(Guid rentId);
         GetMyRentsDtoResponse? GetMyRents();
         GetMyArchivedRentsDtoResponse? GetMyArchivedRents();
