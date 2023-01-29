@@ -27,7 +27,8 @@ export default function RentCreate({ vehicleId }: Props) {
 
     const { startDate, endDate } = rent;
 
-    const isDisabled = startDate.getDate() >= endDate.getDate() || startDate.getDate() < new Date().getDate();
+    const isDisabled = startDate.getTime() >= endDate.getTime() 
+        || startDate.getTime() < new Date().getTime();
 
     const handleSubmit = () => {
         agent.Rent

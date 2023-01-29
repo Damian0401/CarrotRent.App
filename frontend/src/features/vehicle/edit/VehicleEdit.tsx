@@ -41,7 +41,6 @@ export default function VehicleEdit() {
             yearOfProduction: vehicle.yearOfProduction,
             imageUrl: vehicle.imageUrl
         };
-        console.log(editValues)
         agent.Vehicle.update(id, editValues).then(() => navigate(-1));
     }
 
@@ -66,7 +65,7 @@ export default function VehicleEdit() {
                                 .max(255),
                             yearOfProduction: Yup.number()
                                 .required(),
-                            seats: Yup.string()
+                            seats: Yup.number()
                                 .required()
                                 .max(10)
                                 .min(1),
