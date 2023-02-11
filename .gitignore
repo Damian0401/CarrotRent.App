@@ -486,3 +486,6 @@ yarn-error.log*
 *.db
 *.db-shm
 *.db-wal
+
+# hide development dependencies
+appsettings.Development.json
