@@ -208,6 +208,29 @@ public static class RestEndpointExtensions
             return Results.Ok(response);
         });
 
+        app.MapPost("/api/v1/account/register/{id:guid}/employee",
+        [Authorize(Roles = Roles.Manager)]
+        ([FromBody] CreateEmployeeDtoRequest dto, [FromRoute] Guid id, [FromServices] IAccountService service,
+            [FromServices] IValidator<CreateEmployeeDtoRequest> validator) =>
+        {
+            var validationResult = validator.Validate(dto);
+
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors
+                    .Select(x => x.ErrorMessage);
+
+                return Results.BadRequest(new { Errors = errors });
+            }
+
+            var isCreated = service.CreateEmployee(dto, id);
+
+            if (!isCreated)
+                return Results.BadRequest();
+
+            return Results.NoContent();
+        });
+
         app.MapPost("/api/v1/account/verify/{id:guid}",
         [Authorize(Roles = Roles.Manager + "," + Roles.Employee)]
         ([FromRoute] Guid id, [FromServices] IAccountService service) =>
