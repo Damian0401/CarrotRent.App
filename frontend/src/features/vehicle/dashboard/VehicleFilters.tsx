@@ -1,5 +1,12 @@
 import { SearchIcon } from "@chakra-ui/icons";
-import { Flex, IconButton, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, RangeSlider, RangeSliderFilledTrack, RangeSliderThumb, RangeSliderTrack, Select, Text } from "@chakra-ui/react";
+import {
+    Flex, IconButton, NumberDecrementStepper,
+    NumberIncrementStepper, NumberInput,
+    NumberInputField, NumberInputStepper,
+    RangeSlider, RangeSliderFilledTrack,
+    RangeSliderThumb, RangeSliderTrack,
+    Select, Text
+} from "@chakra-ui/react";
 import { ChangeEvent, useEffect, useState } from "react";
 import agent from "../../../app/api/agent";
 import LoadingSpinner from "../../../app/layout/LoadingSpinner";

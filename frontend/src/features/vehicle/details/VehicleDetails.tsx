@@ -1,7 +1,6 @@
-import { CardBody, CardFooter, CardHeader } from "@chakra-ui/card";
-import { Button, ButtonGroup, Flex, Grid, GridItem, Heading, Text } from "@chakra-ui/react";
+import { Button, ButtonGroup, Grid, GridItem, Heading, Text } from "@chakra-ui/react";
 import { CSSProperties, useContext, useEffect, useState } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import agent from "../../../app/api/agent";
 import { UserContext } from "../../../app/common/providers/UserProvider";
 import ContentCard from "../../../app/common/shared/ContentCard";

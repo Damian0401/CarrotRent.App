@@ -1,6 +1,6 @@
 import { CardBody, CardHeader } from "@chakra-ui/card";
 import { Heading, Stack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import agent from "../../../app/api/agent";
 import ContentCard from "../../../app/common/shared/ContentCard";
 import { SelectedFilters, Vehicle } from "../../../app/models/Vehicle";
