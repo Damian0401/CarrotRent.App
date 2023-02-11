@@ -21,6 +21,7 @@ import { ToastContainer } from "react-toastify";
 import AccessDenied from "../../features/error/AccessDenied";
 import { UserUnverified } from "../../features/user/unverified/UserUnverified";
 import RentArchive from "../../features/rent/archive/RentArchive";
+import CreateEmployee from "../../features/account/CreateEmployee";
 
 function App() {
   return (
@@ -41,6 +42,12 @@ function App() {
             <Route index element={<DepartmentDashboard />} />
             <Route path=':departmentId'>
               <Route index element={<DepartmentDetails />} />
+              <Route path='employee'
+                element={<PrivateRoute
+                  roles={[MANAGER]}
+                  Component={CreateEmployee}
+                />}
+              />
               <Route path='rents'>
                 <Route index
                   element={<PrivateRoute

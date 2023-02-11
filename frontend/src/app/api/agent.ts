@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { BASE_API_URL } from "../common/utils/constants";
 import { Department as DepartmentDto, DepartmentDetails, DepartmentMarker } from "../models/Department";
-import { User, UserDetails, UserLoginValues, UserRegisterValues } from "../models/User";
+import { CreateEmployeeValues, User, UserDetails, UserLoginValues, UserRegisterValues } from "../models/User";
 import { SelectedFilters, Vehicle as VehicleDto, VehicleCreateValues, VehicleDetails, VehicleEditValues, VehicleFilters } from "../models/Vehicle";
 import { history } from "../..";
 import { Rent as RentDto, RentCost, RentCreate, RentDetails } from "../models/Rent";
@@ -17,8 +17,7 @@ axios.interceptors.request.use(request => {
 });
 
 axios.interceptors.response.use(response => response, (error: AxiosError) => {
-    if (!error.response)
-    {
+    if (!error.response) {
         toast.error('Network error');
         return Promise.reject(error);
     }
@@ -49,12 +48,12 @@ const Department = {
     getAll: () => requests.get<{ departments: DepartmentDto[] }>('/department').then(x => x.departments),
     getMarkers: () => requests.get<{ departments: DepartmentMarker[] }>('/department').then(x => x.departments),
     getById: (id: string) => requests.get<DepartmentDetails>(`/department/${id}`),
-    getRents: (id: string) => requests.get<{rents: RentDto[]}>(`/department/${id}/rents`).then(x => {
+    getRents: (id: string) => requests.get<{ rents: RentDto[] }>(`/department/${id}/rents`).then(x => {
         x.rents.forEach(rent => rent.startDate = new Date(rent.startDate));
         x.rents.forEach(rent => rent.endDate = new Date(rent.endDate));
         return x.rents
     }),
-    getArchivedRents: (id: string) => requests.get<{rents: RentDto[]}>(`/department/${id}/rents/archived`).then(x => {
+    getArchivedRents: (id: string) => requests.get<{ rents: RentDto[] }>(`/department/${id}/rents/archived`).then(x => {
         x.rents.forEach(rent => rent.startDate = new Date(rent.startDate));
         x.rents.forEach(rent => rent.endDate = new Date(rent.endDate));
         return x.rents
@@ -62,7 +61,7 @@ const Department = {
 };
 
 const Vehicle = {
-    getAll: ({maxPrice, minPrice, seats, brandId, departmentId, fuelId, modelId}: SelectedFilters) => {
+    getAll: ({ maxPrice, minPrice, seats, brandId, departmentId, fuelId, modelId }: SelectedFilters) => {
         let query = '';
         if (maxPrice) query += `maxPrice=${maxPrice}&`;
         if (minPrice) query += `minPrice=${minPrice}&`;
@@ -83,8 +82,10 @@ const Vehicle = {
 const Account = {
     login: (loginValues: UserLoginValues) => requests.post<User>('account/login', loginValues),
     register: (registerValues: UserRegisterValues) => requests.post<User>('/account/register', registerValues),
-    verify: (id: string) => requests.post(`/account/verify/${id}`,{}),
-    unverified: () => requests.get<{users: UserDetails[]}>('/account/unverified').then(x => x.users),
+    createEmployee: (createEmployeeValues: CreateEmployeeValues, deparmentId: string) =>
+        requests.post<User>(`/account/register/${deparmentId}/employee`, createEmployeeValues),
+    verify: (id: string) => requests.post(`/account/verify/${id}`, {}),
+    unverified: () => requests.get<{ users: UserDetails[] }>('/account/unverified').then(x => x.users),
 }
 
 const Rent = {
@@ -97,12 +98,12 @@ const Rent = {
     issue: (id: string) => requests.post(`/rent/${id}/issue`, {}),
     receive: (id: string) => requests.post<RentCost>(`/rent/${id}/receive`, {}),
     create: (rent: RentCreate) => requests.post('/rent', rent),
-    getMy: () => requests.get<{rents: RentDto[]}>('rent/my').then(x => {
+    getMy: () => requests.get<{ rents: RentDto[] }>('rent/my').then(x => {
         x.rents.forEach(rent => rent.startDate = new Date(rent.startDate));
         x.rents.forEach(rent => rent.endDate = new Date(rent.endDate));
         return x.rents
     }),
-    getMyArchived: () => requests.get<{rents: RentDto[]}>('rent/my/archived').then(x => {
+    getMyArchived: () => requests.get<{ rents: RentDto[] }>('rent/my/archived').then(x => {
         x.rents.forEach(rent => rent.startDate = new Date(rent.startDate));
         x.rents.forEach(rent => rent.endDate = new Date(rent.endDate));
         return x.rents

@@ -15,6 +15,21 @@ export interface UserRegisterValues {
     apartmentNumber: string;
 }
 
+export interface CreateEmployeeValues {
+    login: string;
+    password: string;
+    email: string;
+    pesel: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    postCode: string;
+    city: string;
+    street: string;
+    houseNumber: string;
+    apartmentNumber: string;
+}
+
 
 export interface UserLoginValues {
     login: string;

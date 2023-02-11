@@ -52,7 +52,12 @@ export default function DepartmentDetails() {
                                     />
                                 </Tooltip>}
                                 {userCanManageEmployees(user, department?.id) && <Tooltip label='Add an employee' >
-                                    <IconButton aria-label="manage-button" icon={<EditIcon />} />
+                                    <IconButton
+                                        aria-label="manage-button"
+                                        icon={<EditIcon />}
+                                        as={Link}
+                                        to={`/departments/${departmentId}/employee`}
+                                    />
                                 </Tooltip>}
                                 {userCanManageRents(user, department?.id) && <>
                                     <Tooltip label='Manage rents' >
