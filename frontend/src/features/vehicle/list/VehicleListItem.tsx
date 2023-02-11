@@ -21,14 +21,17 @@ export default function VehicleListItem({ vehicle }: Props) {
             <Flex p='2' _hover={{ bgColor: 'green.400' }} borderRadius='0.5rem'>
                 <img src={vehicle.imageUrl} style={imageStyles} alt='img' />
                 <Box>
-                    <Text p='1' as='b'>
-                        {vehicle.model}
+                    <Text p='1'>
+                        <b>Model:</b> {vehicle.model}
                     </Text>
                     <Text p='1' pt='0'>
-                        {vehicle.brand}
+                        <b>Brand:</b> {vehicle.brand}
                     </Text>
                     <Text p='1' pt='0'>
-                        {vehicle.yearOfProduction}
+                        <b>Year of production:</b> {vehicle.yearOfProduction}
+                    </Text>
+                    <Text p='1' pt='0'>
+                        <b>Price per day:</b> {vehicle.price}$
                     </Text>
                 </Box>
                 <Spacer />
