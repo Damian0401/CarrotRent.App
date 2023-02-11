@@ -1,6 +1,8 @@
 using Application.Core;
 using Application.Interfaces;
 using Application.Services;
+using Application.Validators.Account;
+using FluentValidation;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -13,6 +15,7 @@ public static class ApplicationServiceExtensions
             IConfiguration configuration)
     {
         services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+        services.AddValidatorsFromAssemblyContaining<LoginDtoRequestValidator>();
 
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IDepartmentService, DepartmentService>();
