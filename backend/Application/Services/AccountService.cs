@@ -1,3 +1,4 @@
+using System.Linq;
 using Application.Constants;
 using Application.Dtos.Account;
 using Application.Interfaces;
@@ -54,7 +55,7 @@ public class AccountService : IAccountService
 
     public RegisterDtoResponse? Register(RegisterDtoRequest dto)
     {
-        bool isUserValid = ValidateUser(dto);
+        bool isUserValid = ValidateUser(dto.Email, dto.Login, dto.Pesel, dto.PhoneNumber);
 
         if (!isUserValid)
             return null;
@@ -78,6 +79,40 @@ public class AccountService : IAccountService
         response.Token = _jwtGenerator.CreateToken(user, DateTime.Now.AddDays(3));
 
         return response;
+    }
+
+    public bool CreateEmployee(CreateEmployeeDtoRequest dto, Guid departmentId)
+    {
+        var user = _userAccessor.GetCurrentlyLoggedUser();
+
+        if (user is null || !user.Role.Name.Equals(Roles.Manager))
+            return false;
+
+        if (!user.OwnedDepartments.Any(x => x.Id.Equals(departmentId)))
+            return false;
+
+        bool isEmployeeValid = ValidateUser(dto.Email, dto.Login, dto.Pesel, dto.PhoneNumber);
+
+        if (!isEmployeeValid)
+            return false;
+
+        var address = _mapper.Map<Address>(dto);
+
+        var employeeData = _mapper.Map<UserData>(dto);
+        employeeData.Address = address;
+
+        var employee = _mapper.Map<User>(dto);
+        employee.UserData = employeeData;
+        employee.PasswordHash = GeneratePasswordHash(employee, dto.Password);
+        employee.Role = _accountRepository.GetRoleByName(Roles.Employee);
+        employee.DepartmentId = departmentId;
+
+        bool isCreated = _accountRepository.CreateUser(employee);
+
+        if (!isCreated)
+            return false;
+
+        return true;
     }
 
     public bool VerifyUser(Guid userId)
@@ -123,18 +158,18 @@ public class AccountService : IAccountService
         return isPasswordValid.Equals(PasswordVerificationResult.Success);
     }
 
-    private bool ValidateUser(RegisterDtoRequest dto)
+    private bool ValidateUser(string email, string login, string pesel, string phoneNumber)
     {
-        if (!_accountRepository.IsEmailAvailable(dto.Email))
+        if (!_accountRepository.IsEmailAvailable(email))
             return false;
 
-        if (!_accountRepository.IsLoginAvailable(dto.Login))
+        if (!_accountRepository.IsLoginAvailable(login))
             return false;
 
-        if (!_accountRepository.IsPeselAvailable(dto.Pesel))
+        if (!_accountRepository.IsPeselAvailable(pesel))
             return false;
 
-        if (!_accountRepository.IsPhoneNumberAvailable(dto.PhoneNumber))
+        if (!_accountRepository.IsPhoneNumberAvailable(phoneNumber))
             return false;
 
         return true;

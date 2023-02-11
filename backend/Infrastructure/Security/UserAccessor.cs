@@ -32,6 +32,7 @@ namespace Infrastructure.Security
 
             var user = _context.Users
                 .Include(x => x.Role)
+                .Include(x => x.OwnedDepartments)
                 .FirstOrDefault(x => x.Id.Equals(userIdAsGuid));
 
             return user;

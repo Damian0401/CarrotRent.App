@@ -63,6 +63,8 @@ public class AutoMapperProfile : Profile
     {
         CreateMap<RegisterDtoRequest, User>();
         CreateMap<RegisterDtoRequest, UserData>();
+        CreateMap<CreateEmployeeDtoRequest, User>();
+        CreateMap<CreateEmployeeDtoRequest, UserData>();
         CreateMap<User, RegisterDtoResponse>()
             .ForMember(x => x.Role, s =>
                 s.MapFrom(u => u.Role.Name));
@@ -141,6 +143,7 @@ public class AutoMapperProfile : Profile
     private void MapsForAddress()
     {
         CreateMap<RegisterDtoRequest, Address>();
+        CreateMap<CreateEmployeeDtoRequest, Address>();
     }
 
     private void MapsForFuel()
