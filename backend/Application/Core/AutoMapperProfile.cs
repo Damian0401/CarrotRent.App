@@ -48,6 +48,7 @@ public class AutoMapperProfile : Profile
             .ForMember(x => x.Price, s => s.MapFrom(v => 
                 new Price{PricePerDay = v.Price}));
         CreateMap<Vehicle, VehicleForGetDepartmentByIdDtoResponse>()
+            .ForMember(x => x.Price, s => s.MapFrom(b => b.Price.PricePerDay))
             .ForMember(x => x.Model, s =>
                 s.MapFrom(v => v.Model.Name))
             .ForMember(x => x.Brand, s =>

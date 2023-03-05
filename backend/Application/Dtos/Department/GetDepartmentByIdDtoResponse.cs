@@ -15,5 +15,6 @@ public class VehicleForGetDepartmentByIdDtoResponse
     public string Model { get; set; } = default!;
     public string Brand { get; set; } = default!;
     public int YearOfProduction { get; set; }
+    public double Price { get; set; }
     public string ImageUrl { get; set; } = default!;
 }

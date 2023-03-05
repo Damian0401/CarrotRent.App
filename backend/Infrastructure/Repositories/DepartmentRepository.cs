@@ -31,6 +31,8 @@ public class DepartmentRepository : IDepartmentRepository
             .Include(d => d.Manager)
                 .ThenInclude(x => x.UserData)
             .Include(d => d.Vehicles)
+                .ThenInclude(x => x.Price)
+            .Include(d => d.Vehicles)
                 .ThenInclude(x => x.Model)
                     .ThenInclude(x => x.Brand)
             .FirstOrDefault(x => x.Id.Equals(id));
